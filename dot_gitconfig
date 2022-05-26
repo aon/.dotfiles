@@ -1,0 +1,7 @@
+[include]
+    path = ~/.git-personal-config
+[includeIf "gitdir:~/duollar/"]
+    path = ~/.git-duollar-config
+[pager]
+	branch = false
+	stash = false
