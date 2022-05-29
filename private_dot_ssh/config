@@ -1,0 +1,14 @@
+Host github-aon
+  Hostname github.com
+  IdentityFile ~/.ssh/id_ed25519_github-aon
+  IdentitiesOnly yes
+
+Host github-aaonduollar
+  Hostname github.com
+  IdentityFile ~/.ssh/id_ed25519_github-aaonduollar
+  IdentitiesOnly yes
+
+Host gitlab-agustinaon
+  Hostname gitlab.com
+  IdentityFile ~/.ssh/id_ed25519_gitlab-agustinaon
+  IdentitiesOnly yes
