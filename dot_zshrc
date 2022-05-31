@@ -79,7 +79,7 @@ bindkey '^[[A' history-substring-search-up
 bindkey '^[[B' history-substring-search-down
 
 # fnm
-export PATH=/home/agustin/.fnm:$PATH
+export PATH=$HOME/.fnm:$PATH
 eval "`fnm env`"
 
 # editor
@@ -87,4 +87,5 @@ export VISUAL=vim
 export EDITOR="$VISUAL"
 
 # golang
+export GOPATH=$HOME/.go
 export PATH=$PATH:$(go env GOPATH)/bin
