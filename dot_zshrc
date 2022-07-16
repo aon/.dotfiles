@@ -60,6 +60,7 @@ bindkey '5~' kill-word                                          # delete next wo
 alias cp="cp -i"                                                # Confirm before overwriting something
 alias df='df -h'                                                # Human-readable sizes
 alias free='free -m'                                            # Show sizes in MB
+alias ll='ls -l'
 
 ## Powerlevel10k
 source ~/.zsh/powerlevel10k/powerlevel10k.zsh-theme
