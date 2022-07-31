@@ -1,7 +1,13 @@
 [include]
-    path = ~/.git-personal-config
+	path = ~/.git-personal-config
 [includeIf "gitdir:~/duollar/"]
-    path = ~/.git-duollar-config
+	path = ~/.git-duollar-config
 [pager]
 	branch = false
 	stash = false
+[diff]
+	tool = meld
+[difftool]
+	prompt = false
+[difftool "meld"]
+	cmd = meld "$LOCAL" "$REMOTE"
