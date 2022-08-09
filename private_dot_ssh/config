@@ -21,6 +21,6 @@ Host 192.168.1.102
 
 Host 198.211.99.175
   Hostname 198.211.99.175
-  User root
+  User agustin
   IdentityFile ~/.ssh/id_ed25519_digital-ocean
   IdentitiesOnly yes
