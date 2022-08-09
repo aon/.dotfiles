@@ -2,6 +2,8 @@
 	path = ~/.git-personal-config
 [includeIf "gitdir:~/duollar/"]
 	path = ~/.git-duollar-config
+[url "git@github-aaonduollar:Duollar/"]
+	insteadOf = https://github.com/Duollar/
 [pager]
 	branch = false
 	stash = false
