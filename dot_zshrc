@@ -90,3 +90,5 @@ export EDITOR="$VISUAL"
 export GOPATH=$HOME/.go
 export PATH=$PATH:$(go env GOPATH)/bin
 
+# npm global
+export PATH=~/.npm-global/bin:$PATH
