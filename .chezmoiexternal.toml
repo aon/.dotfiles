@@ -24,7 +24,7 @@
 
 [".zsh/git-completion.bash"]
     type = "file"
-    url = "https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash"
+    url = "https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.zsh"
     refreshPeriod = "168h"
 
 [".tmux"]
