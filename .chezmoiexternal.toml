@@ -22,9 +22,14 @@
     exact = true
     refreshPeriod = "168h"
 
-[".zsh/git-completion.zsh"]
+[".zsh/git-completion.bash"]
     type = "file"
     url = "https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.zsh"
+    refreshPeriod = "168h"
+
+[".zsh/git-completion.zsh"]
+    type = "file"
+    url = "https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash"
     refreshPeriod = "168h"
 
 [".tmux"]
