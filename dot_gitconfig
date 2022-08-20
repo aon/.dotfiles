@@ -13,3 +13,5 @@
 	prompt = false
 [difftool "meld"]
 	cmd = meld "$LOCAL" "$REMOTE"
+[push]
+	autoSetupRemote = true
