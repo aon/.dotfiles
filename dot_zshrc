@@ -93,3 +93,15 @@ export PATH=$PATH:$(go env GOPATH)/bin
 
 # npm global
 export PATH=~/.npm-global/bin:$PATH
+
+# duollar
+alias ktcreate="kafka-topics.sh --create --bootstrap-server=b-2.kafkaclusterdev.re4i1x.c6.kafka.us-east-2.amazonaws.com:9092,b-3.kafkaclusterdev.re4i1x.c6.kafka.us-east-2.amazonaws.com:9092,b-1.kafkaclusterdev.re4i1x.c6.kafka.us-east-2.amazonaws.com:9092 --topic"
+alias ktlist="kafka-topics.sh --list --bootstrap-server=b-2.kafkaclusterdev.re4i1x.c6.kafka.us-east-2.amazonaws.com:9092,b-3.kafkaclusterdev.re4i1x.c6.kafka.us-east-2.amazonaws.com:9092,b-1.kafkaclusterdev.re4i1x.c6.kafka.us-east-2.amazonaws.com:9092"
+alias ktdelete="kafka-topics.sh --delete --bootstrap-server=b-2.kafkaclusterdev.re4i1x.c6.kafka.us-east-2.amazonaws.com:9092,b-3.kafkaclusterdev.re4i1x.c6.kafka.us-east-2.amazonaws.com:9092,b-1.kafkaclusterdev.re4i1x.c6.kafka.us-east-2.amazonaws.com:9092 --topic"
+alias kcc="kafka-console-consumer.sh \
+--bootstrap-server=b-2.kafkaclusterdev.re4i1x.c6.kafka.us-east-2.amazonaws.com:9092,b-3.kafkaclusterdev.re4i1x.c6.kafka.us-east-2.amazonaws.com:9092,b-1.kafkaclusterdev.re4i1x.c6.kafka.us-east-2.amazonaws.com:9092 \
+--from-beginning \
+--topic"
+alias kcp="kafka-console-producer.sh --bootstrap-server=b-2.kafkaclusterdev.re4i1x.c6.kafka.us-east-2.amazonaws.com:9092,b-3.kafkaclusterdev.re4i1x.c6.kafka.us-east-2.amazonaws.com:9092,b-1.kafkaclusterdev.re4i1x.c6.kafka.us-east-2.amazonaws.com:9092"
+alias kcglist="kafka-consumer-groups.sh --list --bootstrap-server=b-2.kafkaclusterdev.re4i1x.c6.kafka.us-east-2.amazonaws.com:9092,b-3.kafkaclusterdev.re4i1x.c6.kafka.us-east-2.amazonaws.com:9092,b-1.kafkaclusterdev.re4i1x.c6.kafka.us-east-2.amazonaws.com:9092"
+alias kcgdescribe="kafka-consumer-groups.sh --bootstrap-server=b-2.kafkaclusterdev.re4i1x.c6.kafka.us-east-2.amazonaws.com:9092,b-3.kafkaclusterdev.re4i1x.c6.kafka.us-east-2.amazonaws.com:9092,b-1.kafkaclusterdev.re4i1x.c6.kafka.us-east-2.amazonaws.com:9092 --describe --group"
