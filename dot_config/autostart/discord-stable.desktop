@@ -1,6 +1,6 @@
 [Desktop Entry]
 Type=Application
-Exec=/opt/discord/Discord
+Exec=/usr/bin/flatpak run --branch=stable --arch=x86_64 --command=discord com.discordapp.Discord
 Hidden=false
 NoDisplay=false
 Name=Discord
