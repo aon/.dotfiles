@@ -95,7 +95,9 @@ export PATH=$PATH:$(go env GOPATH)/bin
 export PATH=~/.npm-global/bin:$PATH
 
 # rust
-source ~/.cargo/env
+if [ -f ~/.cargo/env ]; then
+    source ~/.cargo/env
+fi
 
 # duollar
 alias ktcreate="kafka-topics.sh --create --bootstrap-server=b-2.kafkaclusterdev.re4i1x.c6.kafka.us-east-2.amazonaws.com:9092,b-3.kafkaclusterdev.re4i1x.c6.kafka.us-east-2.amazonaws.com:9092,b-1.kafkaclusterdev.re4i1x.c6.kafka.us-east-2.amazonaws.com:9092 --topic"
