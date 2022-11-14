@@ -2,4 +2,5 @@
     autoCommit = true
     autoPush = true
 [merge]
-    command = "code"
+    command = "nvim"
+    args = ["-d", "{{ .Destination }}", "{{ .Source }}", "{{ .Target }}"]
