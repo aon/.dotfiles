@@ -24,6 +24,9 @@ HISTSIZE=10000
 SAVEHIST=10000
 WORDCHARS=${WORDCHARS//\/[&.;]}
 
+# Ls colors
+export CLICOLOR=1
+
 ## Keybindings
 bindkey -e
 bindkey '^[[7~' beginning-of-line                               # Home key
