@@ -5,3 +5,4 @@
     autoPush = true
 [merge]
     command = "meld"
+
