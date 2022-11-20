@@ -1,3 +1,5 @@
+[edit]
+    apply = true
 [git]
     autoCommit = true
     autoPush = true
