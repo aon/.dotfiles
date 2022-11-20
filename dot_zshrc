@@ -104,3 +104,6 @@ if [ -d $HOME/Library/Android/sdk ]; then
     export JAVA_HOME=$(/usr/libexec/java_home)
 fi
 
+# brew libraries
+export LIBRARY_PATH="$LIBRARY_PATH:$(brew --prefix)/lib"
+
