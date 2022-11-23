@@ -9,6 +9,8 @@
 	prompt = false
 [difftool "meld"]
 	cmd = meld "$LOCAL" "$REMOTE"
+[url "ssh://git@github.com/"]
+	insteadOf = https://github.com/
 [push]
 	autoSetupRemote = true
 [alias]
