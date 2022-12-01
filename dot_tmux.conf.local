@@ -369,6 +369,7 @@ set -g mouse on
 
 # -- plugins--------------------------------------------------------------------
 run-shell ~/.tmux-plugins/tmux-resurrect/resurrect.tmux
+run-shell ~/.tmux-plugins/tmux-continuum/continuum.tmux
 
 
 # -- tpm -----------------------------------------------------------------------
