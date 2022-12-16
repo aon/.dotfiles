@@ -367,11 +367,6 @@ set -g mouse on
 #set -g status-position top
 
 
-# -- plugins--------------------------------------------------------------------
-run-shell ~/.tmux-plugins/tmux-resurrect/resurrect.tmux
-run-shell ~/.tmux-plugins/tmux-continuum/continuum.tmux
-
-
 # -- tpm -----------------------------------------------------------------------
 
 # while I don't use tpm myself, many people requested official support so here
