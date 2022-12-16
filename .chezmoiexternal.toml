@@ -26,14 +26,4 @@
     url = "git@github.com:gpakosz/.tmux.git"
     exact = true
     refreshPeriod = "168h"
-[".tmux-plugins/tmux-resurrect"]
-    type = "git-repo"
-    url = "git@github.com:tmux-plugins/tmux-resurrect.git"
-    exact = true
-    refreshPeriod = "168h"
-[".tmux-plugins/tmux-continuum"]
-    type = "git-repo"
-    url = "git@github.com:tmux-plugins/tmux-continuum.git"
-    exact = true
-    refreshPeriod = "168h"
 
