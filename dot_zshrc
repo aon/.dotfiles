@@ -107,3 +107,9 @@ fi
 # brew libraries
 export LIBRARY_PATH="$LIBRARY_PATH:$(brew --prefix)/lib"
 
+# custom homebrew LLVM
+BREW_PREFIX=$(brew --prefix)
+export PATH="$BREW_PREFIX/opt/llvm/bin:$PATH"
+# hack for building WASM via Rust on M1 chips
+export CC=$BREW_PREFIX/opt/llvm/bin/clang
+export AR=$BREW_PREFIX/opt/llvm/bin/llvm-ar
