@@ -119,3 +119,8 @@ export PATH="$BREW_PREFIX/opt/llvm/bin:$PATH"
 # hack for building WASM via Rust on M1 chips
 export CC=$BREW_PREFIX/opt/llvm/bin/clang
 export AR=$BREW_PREFIX/opt/llvm/bin/llvm-ar
+
+# pnpm
+export PNPM_HOME="/Users/agustin/Library/pnpm"
+export PATH="$PNPM_HOME:$PATH"
+# pnpm end
