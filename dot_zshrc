@@ -124,3 +124,6 @@ export AR=$BREW_PREFIX/opt/llvm/bin/llvm-ar
 export PNPM_HOME="/Users/agustin/Library/pnpm"
 export PATH="$PNPM_HOME:$PATH"
 # pnpm end
+
+# macos specific
+ulimit -n 10240
