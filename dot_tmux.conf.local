@@ -367,6 +367,9 @@ set -g mouse on
 # move status line to top
 #set -g status-position top
 
+# sort sessions by name
+bind s choose-tree -sZ -O name
+
 
 # -- tpm -----------------------------------------------------------------------
 
