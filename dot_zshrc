@@ -67,6 +67,8 @@ alias df='df -h'                                                # Human-readable
 alias free='free -m'                                            # Show sizes in MB
 alias ll='ls -l'
 alias vim="nvim"
+alias pip="pip3"
+alias python="python3"
 
 ## Powerlevel10k
 source ~/.zsh/powerlevel10k/powerlevel10k.zsh-theme
