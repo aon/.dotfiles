@@ -55,7 +55,7 @@ bindkey '^[[6~' history-beginning-search-forward                # Page down key
 # Navigate words with opt+arrow keys
 bindkey '[C' forward-word
 bindkey '[D' backward-word
-bindkey '^H' backward-kill-word                                 # delete previous word with ctrl+backspace
+bindkey '^?' backward-kill-word                                 # delete previous word with ctrl+backspace
 bindkey '5~' kill-word                                          # delete next word with ctrl+del
 
 
