@@ -55,9 +55,8 @@ bindkey '^[[6~' history-beginning-search-forward                # Page down key
 # Navigate words with opt+arrow keys
 bindkey '[C' forward-word
 bindkey '[D' backward-word
-bindkey '^[^?' backward-kill-word                                 # delete previous word with ctrl+backspace
-bindkey '5~' kill-word                                          # delete next word with ctrl+del
-
+#bindkey '^[^?' backward-kill-word
+#bindkey '5~' kill-word
 
 ## Alias section
 alias cp="cp -i"                                                # Confirm before overwriting something
