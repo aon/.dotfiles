@@ -94,8 +94,10 @@ export VISUAL=nvim
 export EDITOR="$VISUAL"
 
 # golang
-export GOPATH=$HOME/.go
-export PATH=$PATH:$(go env GOPATH)/bin
+if type go &> /dev/null; then
+    export GOPATH=$HOME/.go
+    export PATH=$PATH:$(go env GOPATH)/bin
+fi
 
 # npm global
 export PATH=~/.npm-global/bin:$PATH
