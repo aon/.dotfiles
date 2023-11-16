@@ -370,6 +370,8 @@ set -g mouse on
 # sort sessions by name
 bind s choose-tree -sZ -O name
 
+# disable copy mode jump to bottom
+unbind -T copy-mode-vi MouseDragEnd1Pane
 
 # -- tpm -----------------------------------------------------------------------
 
