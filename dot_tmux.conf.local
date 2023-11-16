@@ -371,7 +371,7 @@ set -g mouse on
 bind s choose-tree -sZ -O name
 
 # disable copy mode jump to bottom
-unbind -T copy-mode-vi MouseDragEnd1Pane
+#unbind -T copy-mode-vi MouseDragEnd1Pane
 
 # -- tpm -----------------------------------------------------------------------
 
