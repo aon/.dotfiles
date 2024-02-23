@@ -131,3 +131,7 @@ export PATH="$PNPM_HOME:$PATH"
 
 # macos specific
 ulimit -n 10240
+
+# zoxide
+eval "$(zoxide init zsh)"
+alias cd=z
