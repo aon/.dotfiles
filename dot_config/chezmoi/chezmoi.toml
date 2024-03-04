@@ -5,4 +5,4 @@
     autoPush = true
 [merge]
     command = "code"
-    args = ["--diff", "{{ .Destination }}", "{{ .Source }}", "{{ .Target }}"] 
+    args = ["--wait", "--diff", "{{ .Destination }}", "{{ .Source }}", "{{ .Target }}"] 
