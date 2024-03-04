@@ -4,5 +4,5 @@
     autoCommit = true
     autoPush = true
 [merge]
-    command = "meld"
+    command = "code"
 
