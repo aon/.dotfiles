@@ -136,5 +136,9 @@ ulimit -n 10240
 eval "$(zoxide init zsh)"
 alias cd=z
 
+# iterm
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+
+# forgit
+[ -f "${HOME}/.zsh/forgit/forgit.plugin.zsh ] && source ${HOME}/.zsh/forgit/forgit.plugin.zsh
 
