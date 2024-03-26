@@ -26,4 +26,8 @@
     url = "git@github.com:gpakosz/.tmux.git"
     exact = true
     refreshPeriod = "168h"
-
+[".zsh/forgit"]
+    type = "git-repo"
+    url = "git@github.com:wfxr/forgit.git"
+    exact = true
+    refreshPeriod = "168h"
