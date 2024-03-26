@@ -140,5 +140,5 @@ alias cd=z
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
 # forgit
-[ -f "${HOME}/.zsh/forgit/forgit.plugin.zsh ] && source ${HOME}/.zsh/forgit/forgit.plugin.zsh
+[ -f "${HOME}/.zsh/forgit/forgit.plugin.zsh" ] && source "${HOME}/.zsh/forgit/forgit.plugin.zsh"
 
