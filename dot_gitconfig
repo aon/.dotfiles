@@ -14,4 +14,4 @@
 [push]
 	autoSetupRemote = true
 [alias]
-	ap = ! git add -N . && git add -p
+	s = status
