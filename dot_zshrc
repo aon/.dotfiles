@@ -52,8 +52,8 @@ bindkey '^[[D'  backward-char                                   # Left key
 bindkey '^[[5~' history-beginning-search-backward               # Page up key
 bindkey '^[[6~' history-beginning-search-forward                # Page down key
 bindkey '^L'    clear-screen					# Clear screen
-#bindkey '[C'    forward-word
-#bindkey '[D'    backward-word
+bindkey '[C'    forward-word					# Move one word forward	
+bindkey '[D'    backward-word					# Move one word backwards
 
 ## Alias section
 alias cp="cp -i"                                                # Confirm before overwriting something
