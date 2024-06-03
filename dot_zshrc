@@ -8,11 +8,14 @@ fi
 # Preload brew completions MUST BE DONE BEFORE COMPINIT
 if type brew &>/dev/null; then
   FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
+  export LIBRARY_PATH="$LIBRARY_PATH:$(brew --prefix)/lib"
 fi
 
+# Autocompletions
+autoload -Uz compinit
+compinit
 
 ## ZSH options
-autoload -Uz compinit && compinit
 setopt extendedglob                                             # Extended globbing. Allows using regular expressions with *
 setopt nobeep                                                   # No beep
 setopt autocd                                                   # if only directory path is entered, cd there.
@@ -57,7 +60,7 @@ bindkey '^[[D'  backward-char                                   # Left key
 bindkey '^[[5~' history-beginning-search-backward               # Page up key
 bindkey '^[[6~' history-beginning-search-forward                # Page down key
 bindkey '^L'    clear-screen					# Clear screen
-bindkey '[C'    forward-word					# Move one word forward	
+bindkey '[C'    forward-word					# Move one word forward
 bindkey '[D'    backward-word					# Move one word backwards
 
 ## Alias section
@@ -85,15 +88,10 @@ bindkey "$terminfo[kcud1]" history-substring-search-down
 bindkey '^[[A' history-substring-search-up
 bindkey '^[[B' history-substring-search-down
 
-# fnm
-if type fnm &> /dev/null; then
-    export PATH=$HOME/.fnm:$PATH
-    eval "`fnm env`"
-fi
+## Applications
 
-# editor
-export VISUAL=nvim
-export EDITOR="$VISUAL"
+# forgit
+[ -f "${HOME}/.zsh/forgit/forgit.plugin.zsh" ] && source "${HOME}/.zsh/forgit/forgit.plugin.zsh"
 
 # golang
 if type go &> /dev/null; then
@@ -101,49 +99,29 @@ if type go &> /dev/null; then
     export PATH=$PATH:$(go env GOPATH)/bin
 fi
 
+# iterm
+test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+
+# macos specific
+ulimit -n 10240
+
 # npm global
 export PATH=~/.npm-global/bin:$PATH
+
+# nvm
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+# pnpm
+export PNPM_HOME="/Users/agustin/Library/pnpm"
+export PATH="$PNPM_HOME:$PATH"
 
 # rust
 if [ -f ~/.cargo/env ]; then
     source ~/.cargo/env
 fi
 
-# android-studio
-if [ -d $HOME/Library/Android/sdk ]; then
-    export ANDROID_HOME=$HOME/Library/Android/sdk
-    export PATH=$ANDROID_HOME/platform-tools:$PATH
-    export JAVA_HOME=$(/usr/libexec/java_home)
-fi
-
-# brew libraries
-export LIBRARY_PATH="$LIBRARY_PATH:$(brew --prefix)/lib"
-
-# custom homebrew LLVM
-BREW_PREFIX=$(brew --prefix)
-export PATH="$BREW_PREFIX/opt/llvm/bin:$PATH"
-# hack for building WASM via Rust on M1 chips
-export CC=$BREW_PREFIX/opt/llvm/bin/clang
-export AR=$BREW_PREFIX/opt/llvm/bin/llvm-ar
-
-# pnpm
-export PNPM_HOME="/Users/agustin/Library/pnpm"
-export PATH="$PNPM_HOME:$PATH"
-# pnpm end
-
-# macos specific
-ulimit -n 10240
-
 # zoxide
 eval "$(zoxide init zsh)"
 alias cd=z
-
-# iterm
-test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
-
-# forgit
-[ -f "${HOME}/.zsh/forgit/forgit.plugin.zsh" ] && source "${HOME}/.zsh/forgit/forgit.plugin.zsh"
-
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
