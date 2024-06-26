@@ -125,3 +125,6 @@ fi
 # zoxide
 eval "$(zoxide init zsh)"
 alias cd=z
+
+# corepack
+export COREPACK_ENABLE_AUTO_PIN=0
