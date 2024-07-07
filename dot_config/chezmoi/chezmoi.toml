@@ -1,8 +1,0 @@
-[edit]
-    apply = true
-[git]
-    autoCommit = true
-    autoPush = true
-[merge]
-    command = "code"
-    args = ["--wait", "--diff", "{{ .Destination }}", "{{ .Source }}", "{{ .Target }}"] 

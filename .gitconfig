@@ -1,14 +1,9 @@
-[include]
-	path = ~/.git-personal-config
+[user]
+	email = 21188659+aon@users.noreply.github.com
+	name = aon
 [pager]
 	branch = false
 	stash = false
-[diff]
-	tool = meld
-[difftool]
-	prompt = false
-[difftool "meld"]
-	cmd = meld "$LOCAL" "$REMOTE"
 [url "ssh://git@github.com/"]
 	insteadOf = https://github.com/
 [push]

@@ -5,6 +5,9 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
+# Variables
+DOTFILES=${HOME}/.dotfiles
+
 # Preload brew completions MUST BE DONE BEFORE COMPINIT
 if type brew &>/dev/null; then
   FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
@@ -31,8 +34,8 @@ zstyle ':completion:*' rehash true                              # automatically 
 # Speed up completions
 zstyle ':completion:*' accept-exact '*(N)'
 zstyle ':completion:*' use-cache on
-zstyle ':completion:*' cache-path ~/.zsh/cache
-HISTFILE=~/.zhistory
+zstyle ':completion:*' cache-path ${HOME}/.zsh/cache
+HISTFILE=${HOME}/.zhistory
 HISTSIZE=10000
 SAVEHIST=10000
 HISTDUP=erase
@@ -57,11 +60,11 @@ bindkey '^[[2~' overwrite-mode                                  # Insert key
 bindkey '^[[3~' delete-char                                     # Delete key
 bindkey '^[[C'  forward-char                                    # Right key
 bindkey '^[[D'  backward-char                                   # Left key
-bindkey '^[[5~' history-beginning-search-backward               # Page up key
-bindkey '^[[6~' history-beginning-search-forward                # Page down key
-bindkey '^L'    clear-screen					# Clear screen
-bindkey '[C'    forward-word					# Move one word forward
-bindkey '[D'    backward-word					# Move one word backwards
+# bindkey '^[[5~' history-beginning-search-backward               # Page up key
+# bindkey '^[[6~' history-beginning-search-forward                # Page down key
+bindkey '^L'    clear-screen					                          # Clear screen
+bindkey '[C'    forward-word					                          # Move one word forward
+bindkey '[D'    backward-word					                          # Move one word backwards
 
 ## Alias section
 alias cp="cp -i"                                                # Confirm before overwriting something
@@ -72,14 +75,17 @@ alias vim="nvim"
 alias pip="pip3"
 alias python="python3"
 
+## Source utils
+[ -f "${HOME}/.zshrc_utils" ] && source "${HOME}/.zshrc_utils"
+
 ## Powerlevel10k
-source ~/.zsh/powerlevel10k/powerlevel10k.zsh-theme
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+source_if_exists ${DOTFILES}/zsh/powerlevel10k/powerlevel10k.zsh-theme
+source_if_exists ${HOME}/.p10k.zsh
 
 ## Plugins
-source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
-source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-source ~/.zsh/zsh-history-substring-search/zsh-history-substring-search.zsh
+# source ${HOME}/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
+# source ${HOME}/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+# source ${HOME}/.zsh/zsh-history-substring-search/zsh-history-substring-search.zsh
 
 # bind UP and DOWN arrow keys to history substring search
 zmodload zsh/terminfo
@@ -91,7 +97,7 @@ bindkey '^[[B' history-substring-search-down
 ## Applications
 
 # forgit
-[ -f "${HOME}/.zsh/forgit/forgit.plugin.zsh" ] && source "${HOME}/.zsh/forgit/forgit.plugin.zsh"
+source_if_exists "${HOME}/.zsh/forgit/forgit.plugin.zsh"
 
 # golang
 if type go &> /dev/null; then
@@ -100,31 +106,29 @@ if type go &> /dev/null; then
 fi
 
 # iterm
-test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+source_if_exists "${HOME}/.iterm2_shell_integration.zsh"
 
 # macos specific
 ulimit -n 10240
 
 # npm global
-export PATH=~/.npm-global/bin:$PATH
+export PATH=${HOME}/.npm-global/bin:$PATH
 
 # nvm
-export NVM_DIR="$HOME/.nvm"
+export NVM_DIR="${HOME}/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 # pnpm
-export PNPM_HOME="/Users/agustin/Library/pnpm"
+export PNPM_HOME="${HOME}/Library/pnpm"
 export PATH="$PNPM_HOME:$PATH"
 
 # rust
-if [ -f ~/.cargo/env ]; then
-    source ~/.cargo/env
-fi
+source_if_exists ${HOME}/.cargo/env
 
 # zoxide
-eval "$(zoxide init zsh)"
-alias cd=z
+# eval "$(zoxide init zsh)"
+# alias cd=z
 
 # corepack
 export COREPACK_ENABLE_AUTO_PIN=0
