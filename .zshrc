@@ -83,7 +83,7 @@ source_if_exists ${DOTFILES}/zsh/powerlevel10k/powerlevel10k.zsh-theme
 source_if_exists ${HOME}/.p10k.zsh
 
 ## Plugins
-source ${DOTFILES}/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source ${DOTFILES}/zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 # source ${HOME}/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
 # source ${HOME}/.zsh/zsh-history-substring-search/zsh-history-substring-search.zsh
 
