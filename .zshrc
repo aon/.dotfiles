@@ -14,38 +14,38 @@ if type brew &>/dev/null; then
   export LIBRARY_PATH="$LIBRARY_PATH:$(brew --prefix)/lib"
 fi
 
-# Autocompletions
-autoload -Uz compinit
-compinit
-
 ## ZSH options
 setopt extendedglob                                             # Extended globbing. Allows using regular expressions with *
 setopt nobeep                                                   # No beep
 setopt autocd                                                   # if only directory path is entered, cd there.
-setopt inc_append_history                                       # save commands are added to the history immediately, otherwise only when shell exits.
-setopt hist_ignore_all_dups
-setopt hist_save_no_dups
-setopt hist_ignore_dups
-setopt hist_find_no_dups
 # Speed up completions
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'       # Case insensitive tab completion
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"         # Colored completion (different colors for dirs/files/etc)
 zstyle ':completion:*' rehash true                              # automatically find new executables in path
-# Speed up completions
 zstyle ':completion:*' accept-exact '*(N)'
 zstyle ':completion:*' use-cache on
-zstyle ':completion:*' cache-path ${HOME}/.zsh/cache
-HISTFILE=${HOME}/.zhistory
-HISTSIZE=10000
-SAVEHIST=10000
-HISTDUP=erase
+zstyle ':completion:*' cache-path ${HOME}/.zsh_cache
+zstyle ':completion:*' menu no                                  # Disable menu completion in favor of fzf plugin
+zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls --color $realpath'  # Preview for fzf-tab
+zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls --color $realpath'  # Preview for zoxide
+
 WORDCHARS=${WORDCHARS//\/[&.;]}
 
-# Ls colors
-export CLICOLOR=1
+# History
+HISTFILE=${HOME}/.zsh_history
+HISTSIZE=10000
+SAVEHIST=$HISTSIZE
+HISTDUP=erase                                                   # Erase duplicates in history
+setopt appendhistory                                            # Append history
+setopt sharehistory                                             # Share history between sessions
+setopt hist_ignore_space                                        # Ignore commands that start with a space
+setopt hist_ignore_all_dups
+setopt hist_save_no_dups
+setopt hist_ignore_dups
+setopt hist_find_no_dups
 
 ## Keybindings
-bindkey -e
+bindkey -e                                                      # Use emacs key bindings
 bindkey '^[[7~' beginning-of-line                               # Home key
 bindkey '^[[H' beginning-of-line                                # Home key
 if [[ "${terminfo[khome]}" != "" ]]; then
@@ -60,16 +60,23 @@ bindkey '^[[2~' overwrite-mode                                  # Insert key
 bindkey '^[[3~' delete-char                                     # Delete key
 bindkey '^[[C'  forward-char                                    # Right key
 bindkey '^[[D'  backward-char                                   # Left key
-# bindkey '^[[5~' history-beginning-search-backward               # Page up key
-# bindkey '^[[6~' history-beginning-search-forward                # Page down key
+bindkey '^[[5~' history-beginning-search-backward               # Page up key
+bindkey '^[[6~' history-beginning-search-forward                # Page down key
 bindkey '^L'    clear-screen					                          # Clear screen
 bindkey '[C'    forward-word					                          # Move one word forward
 bindkey '[D'    backward-word					                          # Move one word backwards
+# Bind up and down arrow keys to history substring search
+zmodload zsh/terminfo
+bindkey "$terminfo[kcuu1]" history-substring-search-up
+bindkey "$terminfo[kcud1]" history-substring-search-down
+bindkey '^[[A' history-substring-search-up
+bindkey '^[[B' history-substring-search-down
 
 ## Alias section
 alias cp="cp -i"                                                # Confirm before overwriting something
 alias df='df -h'                                                # Human-readable sizes
 alias free='free -m'                                            # Show sizes in MB
+alias ls="ls --color"
 alias ll='ls -l'
 alias vim="nvim"
 alias pip="pip3"
@@ -83,21 +90,22 @@ source_if_exists ${DOTFILES}/zsh/powerlevel10k/powerlevel10k.zsh-theme
 source_if_exists ${HOME}/.p10k.zsh
 
 ## Plugins
-source ${DOTFILES}/zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-# source ${HOME}/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
-# source ${HOME}/.zsh/zsh-history-substring-search/zsh-history-substring-search.zsh
+# Order is carefully chosen to avoid conflicts
+fpath=(${DOTFILES}/zsh/zsh-completions/src $fpath)
+autoload -Uz compinit; compinit
 
-# bind UP and DOWN arrow keys to history substring search
-zmodload zsh/terminfo
-bindkey "$terminfo[kcuu1]" history-substring-search-up
-bindkey "$terminfo[kcud1]" history-substring-search-down
-bindkey '^[[A' history-substring-search-up
-bindkey '^[[B' history-substring-search-down
+source ${DOTFILES}/zsh/fzf-tab/fzf-tab.plugin.zsh
+source ${DOTFILES}/zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
+source ${DOTFILES}/zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh  # Must be loaded last but before zsh-history-substring-search
+source ${DOTFILES}/zsh/zsh-history-substring-search/zsh-history-substring-search.zsh
 
 ## Applications
 
 # brew
 export PATH="/opt/homebrew/bin:$PATH"
+
+# fzf
+eval "$(fzf --zsh)"
 
 # forgit
 source_if_exists "${HOME}/.zsh/forgit/forgit.plugin.zsh"
@@ -130,7 +138,7 @@ export PATH="$PNPM_HOME:$PATH"
 source_if_exists ${HOME}/.cargo/env
 
 # zoxide
-# eval "$(zoxide init zsh)"
+eval "$(zoxide init --cmd cd zsh)"
 # alias cd=z
 
 # corepack
