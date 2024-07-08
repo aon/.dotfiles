@@ -143,3 +143,6 @@ eval "$(zoxide init --cmd cd zsh)"
 
 # corepack
 export COREPACK_ENABLE_AUTO_PIN=0
+
+# foundry
+export PATH="$PATH:${HOME}/.foundry/bin"
