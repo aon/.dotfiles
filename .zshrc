@@ -139,7 +139,6 @@ source_if_exists ${HOME}/.cargo/env
 
 # zoxide
 eval "$(zoxide init --cmd cd zsh)"
-# alias cd=z
 
 # corepack
 export COREPACK_ENABLE_AUTO_PIN=0
