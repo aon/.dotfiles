@@ -104,11 +104,17 @@ source ${DOTFILES}/zsh/zsh-history-substring-search/zsh-history-substring-search
 # brew
 export PATH="/opt/homebrew/bin:$PATH"
 
+# corepack
+export COREPACK_ENABLE_AUTO_PIN=0   # Disable auto pinning in package.json
+
 # fzf
 eval "$(fzf --zsh)"
 
 # forgit
 source_if_exists "${HOME}/.zsh/forgit/forgit.plugin.zsh"
+
+# foundry
+export PATH="$PATH:${HOME}/.foundry/bin"
 
 # golang
 if type go &> /dev/null; then
@@ -137,11 +143,8 @@ export PATH="$PNPM_HOME:$PATH"
 # rust
 source_if_exists ${HOME}/.cargo/env
 
+# visual studio code
+export PATH="$PATH:/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
+
 # zoxide
 eval "$(zoxide init --cmd cd zsh)"
-
-# corepack
-export COREPACK_ENABLE_AUTO_PIN=0
-
-# foundry
-export PATH="$PATH:${HOME}/.foundry/bin"
