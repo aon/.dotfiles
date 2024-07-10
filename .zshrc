@@ -92,7 +92,6 @@ source_if_exists ${HOME}/.p10k.zsh
 ## Plugins
 # Order is carefully chosen to avoid conflicts
 fpath=(${DOTFILES}/zsh/zsh-completions/src $fpath)
-autoload -Uz compinit; compinit
 
 source ${DOTFILES}/zsh/fzf-tab/fzf-tab.plugin.zsh
 source ${DOTFILES}/zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
@@ -106,6 +105,17 @@ export PATH="/opt/homebrew/bin:$PATH"
 
 # corepack
 export COREPACK_ENABLE_AUTO_PIN=0   # Disable auto pinning in package.json
+
+# docker
+if type docker &> /dev/null; then
+  if [ ! -f ${HOME}/.docker/completions/_docker ]; then
+    mkdir -p ${HOME}/.docker/completions
+    docker completion zsh > ${HOME}/.docker/completions/_docker
+  fi
+  fpath=(${HOME}/.docker/completions $fpath)
+fi
+
+autoload -Uz compinit; compinit # Must be done after all fpath modifications
 
 # fzf
 eval "$(fzf --zsh)"
