@@ -11,3 +11,4 @@
 [alias]
 	s = status
 	ap = add -p
+	c = checkout
