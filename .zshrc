@@ -120,9 +120,6 @@ autoload -Uz compinit; compinit # Must be done after all fpath modifications
 # fzf
 eval "$(fzf --zsh)"
 
-# forgit
-source_if_exists "${HOME}/.zsh/forgit/forgit.plugin.zsh"
-
 # foundry
 export PATH="$PATH:${HOME}/.foundry/bin"
 
@@ -149,10 +146,6 @@ export NVM_DIR="${HOME}/.nvm"
 autoload -U add-zsh-hook
 add-zsh-hook chpwd load-nvmrc
 load-nvmrc
-
-# pnpm
-export PNPM_HOME="${HOME}/Library/pnpm"
-export PATH="$PNPM_HOME:$PATH"
 
 # rust
 source_if_exists ${HOME}/.cargo/env
