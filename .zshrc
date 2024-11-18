@@ -81,6 +81,8 @@ alias ll='ls -l'
 alias vim="nvim"
 alias pip="pip3"
 alias python="python3"
+alias git-list-gone="git fetch -p && for branch in \$(git for-each-ref --format '%(refname) %(upstream:track)' refs/heads | awk '\$2 == \"[gone]\" {sub(\"refs/heads/\", \"\", \$1); print \$1}'); do echo \$branch; done"
+alias git-delete-gone="git-list-gone | xargs git branch -D"
 
 ## Source utils
 [ -f "${HOME}/.zshrc_utils" ] && source "${HOME}/.zshrc_utils"
