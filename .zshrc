@@ -134,6 +134,11 @@ fi
 # iterm
 source_if_exists "${HOME}/.iterm2_shell_integration.zsh"
 
+# lazydocker
+if type lazydocker &> /dev/null; then
+    alias lzd="lazydocker"
+fi
+
 # macos specific
 ulimit -n 10240
 
