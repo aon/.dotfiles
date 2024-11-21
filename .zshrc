@@ -103,6 +103,9 @@ source ${DOTFILES}/zsh/zsh-history-substring-search/zsh-history-substring-search
 
 ## Applications
 
+# binaries
+export PATH="$PATH:${HOME}/.local/bin"
+
 # brew
 export PATH="/opt/homebrew/bin:$PATH"
 
