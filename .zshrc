@@ -101,10 +101,11 @@ source ${DOTFILES}/zsh/zsh-history-substring-search/zsh-history-substring-search
 export PATH="$PATH:${HOME}/.local/bin"
 
 # brew
-export PATH="/opt/homebrew/bin:$PATH"
+BREW_PREFIX=$(brew --prefix)
+export PATH="${BREW_PREFIX}/bin:$PATH"
 if type brew &>/dev/null; then
-  FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
-  export LIBRARY_PATH="$LIBRARY_PATH:$(brew --prefix)/lib"
+  FPATH="${BREW_PREFIX}/share/zsh/site-functions:${FPATH}"
+  export LIBRARY_PATH="${LIBRARY_PATH}:${BREW_PREFIX}/lib"
 fi
 
 # corepack
@@ -166,6 +167,10 @@ export PATH="$PATH:/Applications/Visual Studio Code.app/Contents/Resources/app/b
 eval "$(zoxide init --cmd cd zsh)"
 
 ## Work related
+
+# zksync-era
+export ROCKSDB_LIB_DIR="${BREW_PREFIX}/Cellar/rocksdb/9.7.4/lib"
+export SNAPPY_LIB_DIR="${BREW_PREFIX}/Cellar/snappy/1.2.1/lib"
 
 # zkstack completion
 source_if_exists "${HOME}/.zsh/completion/_zkstack.zsh"
