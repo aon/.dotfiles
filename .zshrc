@@ -8,12 +8,6 @@ fi
 # Variables
 DOTFILES=${HOME}/.dotfiles
 
-# Preload brew completions MUST BE DONE BEFORE COMPINIT
-if type brew &>/dev/null; then
-  FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
-  export LIBRARY_PATH="$LIBRARY_PATH:$(brew --prefix)/lib"
-fi
-
 ## ZSH options
 setopt extendedglob                                             # Extended globbing. Allows using regular expressions with *
 setopt nobeep                                                   # No beep
@@ -108,6 +102,10 @@ export PATH="$PATH:${HOME}/.local/bin"
 
 # brew
 export PATH="/opt/homebrew/bin:$PATH"
+if type brew &>/dev/null; then
+  FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
+  export LIBRARY_PATH="$LIBRARY_PATH:$(brew --prefix)/lib"
+fi
 
 # corepack
 export COREPACK_ENABLE_AUTO_PIN=0   # Disable auto pinning in package.json
@@ -166,3 +164,8 @@ export PATH="$PATH:/Applications/Visual Studio Code.app/Contents/Resources/app/b
 
 # zoxide
 eval "$(zoxide init --cmd cd zsh)"
+
+## Work related
+
+# zkstack completion
+source_if_exists "${HOME}/.zsh/completion/_zkstack.zsh"
