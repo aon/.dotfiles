@@ -101,8 +101,8 @@ source ${DOTFILES}/zsh/zsh-history-substring-search/zsh-history-substring-search
 export PATH="$PATH:${HOME}/.local/bin"
 
 # brew
+export PATH="/opt/homebrew/bin:$PATH"
 BREW_PREFIX=$(brew --prefix)
-export PATH="${BREW_PREFIX}/bin:$PATH"
 if type brew &>/dev/null; then
   FPATH="${BREW_PREFIX}/share/zsh/site-functions:${FPATH}"
   export LIBRARY_PATH="${LIBRARY_PATH}:${BREW_PREFIX}/lib"
