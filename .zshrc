@@ -31,7 +31,7 @@ HISTSIZE=10000
 SAVEHIST=$HISTSIZE
 HISTDUP=erase                                                   # Erase duplicates in history
 setopt appendhistory                                            # Append history
-setopt sharehistory                                             # Share history between sessions
+setopt no_share_history                                         # Share history between sessions
 setopt hist_ignore_space                                        # Ignore commands that start with a space
 setopt hist_ignore_all_dups
 setopt hist_save_no_dups
