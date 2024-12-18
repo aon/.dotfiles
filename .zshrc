@@ -108,9 +108,6 @@ if type brew &>/dev/null; then
   export LIBRARY_PATH="${LIBRARY_PATH}:${BREW_PREFIX}/lib"
 fi
 
-# corepack
-export COREPACK_ENABLE_AUTO_PIN=0   # Disable auto pinning in package.json
-
 # docker
 if type docker &> /dev/null; then
   if [ ! -f ${HOME}/.docker/completions/_docker ]; then
