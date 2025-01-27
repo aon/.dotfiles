@@ -101,7 +101,7 @@ source ${DOTFILES}/zsh/zsh-history-substring-search/zsh-history-substring-search
 export PATH="$PATH:${HOME}/.local/bin"
 
 # brew
-export PATH="/opt/homebrew/bin:$PATH"
+export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
 BREW_PREFIX=$(brew --prefix)
 if type brew &>/dev/null; then
   FPATH="${BREW_PREFIX}/share/zsh/site-functions:${FPATH}"
