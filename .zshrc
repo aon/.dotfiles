@@ -57,8 +57,9 @@ bindkey '^[[D'  backward-char                                   # Left key
 bindkey '^[[5~' history-beginning-search-backward               # Page up key
 bindkey '^[[6~' history-beginning-search-forward                # Page down key
 bindkey '^L'    clear-screen					                          # Clear screen
-bindkey '[C'    forward-word					                          # Move one word forward
-bindkey '[D'    backward-word					                          # Move one word backwards
+bindkey '^[[1;3C' forward-word  					                      # Move one word forward
+bindkey '^[[1;3D' backward-word   					                    # Move one word backwards
+bindkey '^[[3;3~' kill-word                                     # Delete next word
 # Bind up and down arrow keys to history substring search
 zmodload zsh/terminfo
 bindkey "$terminfo[kcuu1]" history-substring-search-up
