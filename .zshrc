@@ -79,6 +79,7 @@ alias python="python3"
 alias git-list-gone="git fetch -p && for branch in \$(git for-each-ref --format '%(refname) %(upstream:track)' refs/heads | awk '\$2 == \"[gone]\" {sub(\"refs/heads/\", \"\", \$1); print \$1}'); do echo \$branch; done"
 alias git-delete-gone="git-list-gone | xargs git branch -D"
 alias code="cursor"
+alias rr='while [ $? -ne 0 ]; do sleep 1; eval $(history -p !!); done'
 
 ## Source utils
 [ -f "${HOME}/.zshrc_utils" ] && source "${HOME}/.zshrc_utils"
