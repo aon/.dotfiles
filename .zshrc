@@ -144,9 +144,6 @@ fi
 # macos specific
 ulimit -n 10240
 
-# npm global
-export PATH=${HOME}/.npm-global/bin:$PATH
-
 # nvm
 export NVM_DIR="${HOME}/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
@@ -159,9 +156,6 @@ load-nvmrc
 # rust
 source_if_exists ${HOME}/.cargo/env
 
-# visual studio code
-export PATH="$PATH:/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
-
 # zoxide
 eval "$(zoxide init --cmd cd zsh)"
 
@@ -173,18 +167,8 @@ export SNAPPY_LIB_DIR="${BREW_PREFIX}/Cellar/snappy/1.2.1/lib"
 
 # zkstack completion
 source_if_exists "${HOME}/.zsh/completion/_zkstack.zsh"
+
+# pyenv
 export PYENV_ROOT="$HOME/.pyenv"
 [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init - zsh)"
-
-export NARGO_HOME="/Users/agustin/.nargo"
-
-export PATH="$PATH:$NARGO_HOME/bin"
-export PATH="${HOME}/.bb:${PATH}"
-export PATH="/Users/agustin/.bb:$PATH"
-
-# The next line updates PATH for the Google Cloud SDK.
-if [ -f '/Users/agustin/Downloads/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/agustin/Downloads/google-cloud-sdk/path.zsh.inc'; fi
-
-# The next line enables shell command completion for gcloud.
-if [ -f '/Users/agustin/Downloads/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/agustin/Downloads/google-cloud-sdk/completion.zsh.inc'; fi
