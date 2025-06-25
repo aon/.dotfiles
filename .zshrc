@@ -30,7 +30,7 @@ HISTFILE=${HOME}/.zsh_history
 HISTSIZE=10000
 SAVEHIST=$HISTSIZE
 HISTDUP=erase                                                   # Erase duplicates in history
-setopt appendhistory                                            # Append history
+setopt inc_append_history                                       # Append history as soon as it is written
 setopt no_share_history                                         # Share history between sessions
 setopt hist_ignore_space                                        # Ignore commands that start with a space
 setopt hist_ignore_all_dups
@@ -173,3 +173,18 @@ export SNAPPY_LIB_DIR="${BREW_PREFIX}/Cellar/snappy/1.2.1/lib"
 
 # zkstack completion
 source_if_exists "${HOME}/.zsh/completion/_zkstack.zsh"
+export PYENV_ROOT="$HOME/.pyenv"
+[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init - zsh)"
+
+export NARGO_HOME="/Users/agustin/.nargo"
+
+export PATH="$PATH:$NARGO_HOME/bin"
+export PATH="${HOME}/.bb:${PATH}"
+export PATH="/Users/agustin/.bb:$PATH"
+
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f '/Users/agustin/Downloads/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/agustin/Downloads/google-cloud-sdk/path.zsh.inc'; fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f '/Users/agustin/Downloads/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/agustin/Downloads/google-cloud-sdk/completion.zsh.inc'; fi
