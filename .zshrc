@@ -180,4 +180,4 @@ alias tm="task-master"
 
 # claude code
 MSL_ANTHROPIC_AUTH_TOKEN_VAR=$(get_private_config MSL_ANTHROPIC_AUTH_TOKEN)
-alias claude-msl="API_TIMEOUT_MS=180000 DISABLE_NON_ESSENTIAL_MODEL_CALLS=1 ANTHROPIC_AUTH_TOKEN=\$MSL_ANTHROPIC_AUTH_TOKEN_VAR ANTHROPIC_BASE_URL=https://claude-1.msldev.io claude --setings ~/Developer/msl/.claude/settings.json"
+alias claude-msl="CLAUDE_CONFIG_DIR=~/Developer/msl API_TIMEOUT_MS=180000 DISABLE_NON_ESSENTIAL_MODEL_CALLS=1 ANTHROPIC_AUTH_TOKEN=\$MSL_ANTHROPIC_AUTH_TOKEN_VAR ANTHROPIC_BASE_URL=https://claude-1.msldev.io claude"
