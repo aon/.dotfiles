@@ -1,6 +1,6 @@
 [user]
 	email = 21188659+aon@users.noreply.github.com
-	name = aon
+	name = Agustin Aon
 	signingkey = /Users/agustin/.ssh/id_ed25519.pub
 [pager]
 	branch = false
@@ -21,3 +21,8 @@
 	gpgsign = true
 [tag]
 	gpgSign = true
+[filter "lfs"]
+	required = true
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
