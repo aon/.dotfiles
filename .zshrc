@@ -182,9 +182,7 @@ fi
 alias tm="task-master"
 
 # claude code
-alias claude="SHELL=/bin/bash claude"
-MSL_ANTHROPIC_AUTH_TOKEN_VAR=$(get_private_config MSL_ANTHROPIC_AUTH_TOKEN)
-alias claude-msl="ANTHROPIC_CUSTOM_HEADERS='MSL-Account:claude-backup' CLAUDE_CONFIG_DIR=~/Developer/msl API_TIMEOUT_MS=180000 DISABLE_NON_ESSENTIAL_MODEL_CALLS=1 ANTHROPIC_AUTH_TOKEN=\$MSL_ANTHROPIC_AUTH_TOKEN_VAR ANTHROPIC_BASE_URL=https://train.msldev.io claude"
+alias claude-msl="CLAUDE_CONFIG_DIR=~/Developer/msl claude"
 
 # pnpm
 export PNPM_HOME="/Users/agustin/Library/pnpm"
