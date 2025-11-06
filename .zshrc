@@ -142,6 +142,11 @@ if type lazydocker &> /dev/null; then
     alias lzd="lazydocker"
 fi
 
+# libpq
+if [ -d "/opt/homebrew/opt/libpq/bin" ]; then
+    export PATH="/opt/homebrew/opt/libpq/bin:$PATH"
+fi
+
 # macos specific
 ulimit -n 10240
 
@@ -182,12 +187,13 @@ fi
 alias tm="task-master"
 
 # claude code
-alias claude-msl="CLAUDE_CONFIG_DIR=~/Developer/msl claude"
-
-# pnpm
-export PNPM_HOME="/Users/agustin/Library/pnpm"
-case ":$PATH:" in
-  *":$PNPM_HOME:"*) ;;
-  *) export PATH="$PNPM_HOME:$PATH" ;;
-esac
-# pnpm end
+alias claude="SHELL=/bin/bash claude"
+MSL_ANTHROPIC_AUTH_TOKEN_VAR=$(get_private_config MSL_ANTHROPIC_AUTH_TOKEN)
+alias claude-msl="
+  CLAUDE_CONFIG_DIR=~/Developer/msl \
+  API_TIMEOUT_MS=180000 \
+  DISABLE_NON_ESSENTIAL_MODEL_CALLS=1 \
+  ANTHROPIC_AUTH_TOKEN=\$MSL_ANTHROPIC_AUTH_TOKEN_VAR \
+  ANTHROPIC_BASE_URL=https://train.msldev.io \
+  claude
+"
