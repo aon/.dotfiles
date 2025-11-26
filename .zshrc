@@ -81,6 +81,7 @@ alias git-delete-gone="git-list-gone | xargs git branch -D"
 alias code="cursor"
 alias rr='while [ $? -ne 0 ]; do sleep 1; eval $(history -p !!); done'
 alias lg="lazygit"
+alias g="git"
 
 ## Source utils
 [ -f "${HOME}/.zshrc_utils" ] && source "${HOME}/.zshrc_utils"
@@ -176,24 +177,15 @@ export SNAPPY_LIB_DIR="${BREW_PREFIX}/Cellar/snappy/1.2.1/lib"
 # zkstack completion
 source_if_exists "${HOME}/.zsh/completion/_zkstack.zsh"
 
-# pyenv
-if type pyenv &> /dev/null; then
-  export PYENV_ROOT="$HOME/.pyenv"
-  [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
-  eval "$(pyenv init - zsh)"
-fi
-
-# taskmaster
-alias tm="task-master"
-
 # claude code
 alias claude="SHELL=/bin/bash claude"
 MSL_ANTHROPIC_AUTH_TOKEN_VAR=$(get_private_config MSL_ANTHROPIC_AUTH_TOKEN)
 alias claude-msl="
-  CLAUDE_CONFIG_DIR=~/Developer/msl \
-  API_TIMEOUT_MS=180000 \
-  DISABLE_NON_ESSENTIAL_MODEL_CALLS=1 \
-  ANTHROPIC_AUTH_TOKEN=\$MSL_ANTHROPIC_AUTH_TOKEN_VAR \
-  ANTHROPIC_BASE_URL=https://train.msldev.io \
-  claude
+  CLAUDE_CONFIG_DIR=~/Developer/msl/.claude \
+  ANTHROPIC_BEDROCK_BASE_URL=https://train.msldev.io \
+  AWS_BEARER_TOKEN_BEDROCK=\$MSL_ANTHROPIC_AUTH_TOKEN_VAR \
+  CLAUDE_CODE_USE_BEDROCK=true \
+  DISABLE_TELEMETRY=true \
+  claude \
+  --model global.anthropic.claude-opus-4-5-20251101-v1:0
 "

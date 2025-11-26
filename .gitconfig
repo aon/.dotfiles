@@ -14,7 +14,8 @@
 [alias]
 	s = status
 	ap = add -p
-	c = checkout
+    w = worktree
+    c = checkout
 [gpg]
 	format = ssh
 [commit]
