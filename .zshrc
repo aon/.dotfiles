@@ -175,7 +175,7 @@ pnpx() { _load_nvm; pnpx "$@"; }
 bun() { _load_nvm; bun "$@"; }
 bunx() { _load_nvm; bunx "$@"; }
 
-# Auto-switch node version on directory change
+# Auto-switch node version on directory change (and on shell startup)
 autoload -U add-zsh-hook
 _auto_load_nvmrc() {
   if [[ -f .nvmrc ]] && type nvm &>/dev/null; then
@@ -183,6 +183,7 @@ _auto_load_nvmrc() {
   fi
 }
 add-zsh-hook chpwd _auto_load_nvmrc
+_auto_load_nvmrc  # Also run on shell startup for when terminal opens directly in a folder with .nvmrc
 
 # rust
 source_if_exists ${HOME}/.cargo/env
