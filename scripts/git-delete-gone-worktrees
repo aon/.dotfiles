@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Delete local worktrees and branches whose upstream tracking branch no longer exists
+git-list-gone-worktrees | while read -r worktree branch; do
+    echo "Removing worktree: $worktree $branch"
+    git worktree remove "$worktree"
+done
+git-delete-gone-branches

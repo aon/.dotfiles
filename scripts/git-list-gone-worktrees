@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# List local worktrees whose upstream tracking branch no longer exists
+git-list-gone-branches | while read -r branch; do
+    git worktree list | awk -v branch="[$branch]" '$3 == branch { print $1, branch }'
+done
