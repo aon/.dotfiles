@@ -130,6 +130,9 @@ else
   compinit -C
 fi
 
+# editor
+export EDITOR=nvim
+
 # fzf
 eval "$(fzf --zsh)"
 
@@ -198,9 +201,8 @@ fi
 source_if_exists "${HOME}/.zsh/completion/_zkstack.zsh"
 
 # claude code
-alias claude="SHELL=/bin/bash claude"
 claude-msl() {
-  CLAUDE_CONFIG_DIR=~/Developer/msl/.claude \
+  CLAUDE_CONFIG_DIR=${HOME}/Developer/msl/.claude \
   ANTHROPIC_BEDROCK_BASE_URL=https://train.msldev.io \
   AWS_BEARER_TOKEN_BEDROCK="$(get_private_config MSL_ANTHROPIC_AUTH_TOKEN)" \
   CLAUDE_CODE_USE_BEDROCK=true \
