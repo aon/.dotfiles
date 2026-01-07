@@ -192,7 +192,7 @@ _auto_load_nvmrc  # Also run on shell startup for when terminal opens directly i
 source_if_exists ${HOME}/.cargo/env
 
 # zoxide
-if [ -z "$DISABLE_ZOXIDE" ]; then
+if [[ "$CLAUDECODE" != "1" ]]; then
   eval "$(zoxide init --cmd cd zsh)"
 fi
 
