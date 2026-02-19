@@ -110,6 +110,12 @@ BREW_PREFIX="/opt/homebrew"
 FPATH="${BREW_PREFIX}/share/zsh/site-functions:${FPATH}"
 export LIBRARY_PATH="${LIBRARY_PATH}:${BREW_PREFIX}/lib"
 
+# claude code
+claude() {
+  GITHUB_PERSONAL_ACCESS_TOKEN="$(get_private_config GITHUB_PERSONAL_ACCESS_TOKEN)" \
+  /Users/agustin/.local/bin/claude "$@"
+}
+
 # docker (regenerate completions when docker version changes)
 if type docker &> /dev/null; then
   local docker_comp="${HOME}/.docker/completions/_docker"
@@ -197,16 +203,10 @@ if [[ "$CLAUDECODE" != "1" ]]; then
 fi
 
 ## Work related
-# zkstack completion
-source_if_exists "${HOME}/.zsh/completion/_zkstack.zsh"
-
 # claude code
 claude-msl() {
   CLAUDE_CONFIG_DIR=${HOME}/Developer/msl/.claude \
-  ANTHROPIC_BEDROCK_BASE_URL=https://train.msldev.io \
-  AWS_BEARER_TOKEN_BEDROCK="$(get_private_config MSL_ANTHROPIC_AUTH_TOKEN)" \
-  CLAUDE_CODE_USE_BEDROCK=true \
-  DISABLE_TELEMETRY=true \
-  claude \
-  --model global.anthropic.claude-opus-4-5-20251101-v1:0 "$@"
+  ANTHROPIC_BASE_URL=https://train.msldev.io \
+  ANTHROPIC_AUTH_TOKEN="$(get_private_config MSL_ANTHROPIC_AUTH_TOKEN)" \
+  claude  "$@"
 }
