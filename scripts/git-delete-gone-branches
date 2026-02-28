@@ -2,6 +2,6 @@
 set -euo pipefail
 
 # Delete local branches whose upstream tracking branch no longer exists
-git list-gone-branches | while read -r branch; do
+git-list-gone-branches | while read -r branch; do
     git branch -D "$branch"
 done

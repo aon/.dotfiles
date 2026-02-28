@@ -1,7 +1,32 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# List local branches whose upstream tracking branch no longer exists
+# List local branches that are:
+# 1. Tracked a remote branch that no longer exists (gone), OR
+# 2. Have no upstream and are already merged into main
 git fetch -p &>/dev/null
-git for-each-ref --format '%(refname:short) %(upstream:track)' refs/heads \
-    | awk '$2 == "[gone]" { print $1 }'
+
+main_branch="main"
+
+{
+    # Branches whose upstream is gone
+    git for-each-ref --format '%(refname:short) %(upstream:track)' refs/heads \
+        | awk '$2 == "[gone]" { print $1 }'
+
+    # Branches with no upstream that were merged into main via merge commit.
+    # A branch whose tip is on main's first-parent line was never truly merged —
+    # it just points to a commit on main (e.g. created but never diverged).
+    main_first_parents=$(git log --first-parent --format=%H "$main_branch")
+    git for-each-ref --format '%(refname:short) %(upstream)' refs/heads \
+        | awk -v main="$main_branch" '$2 == "" && $1 != main { print $1 }' \
+        | while read -r branch; do
+            if ! git merge-base --is-ancestor "$branch" "$main_branch" 2>/dev/null; then
+                continue
+            fi
+            sha=$(git rev-parse "$branch")
+            if echo "$main_first_parents" | grep -qxF "$sha"; then
+                continue  # tip is on main's first-parent line — not actually merged
+            fi
+            echo "$branch"
+        done
+} | sort -u
