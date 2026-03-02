@@ -212,10 +212,14 @@ if [[ "$CLAUDECODE" != "1" ]]; then
 fi
 
 ## Work related
-# claude code
 claude-msl() {
   CLAUDE_CONFIG_DIR=${HOME}/Developer/msl/.claude \
   ANTHROPIC_BASE_URL=https://train.msldev.io \
   ANTHROPIC_AUTH_TOKEN="$(get_private_config MSL_ANTHROPIC_AUTH_TOKEN)" \
   claude  "$@"
+}
+
+codex-msl() {
+  CODEX_HOME=${HOME}/Developer/msl/.codex \
+  codex  "$@"
 }
