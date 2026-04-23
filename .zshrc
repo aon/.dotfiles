@@ -176,6 +176,9 @@ _auto_load_nvmrc() {
 add-zsh-hook chpwd _auto_load_nvmrc
 _auto_load_nvmrc  # Also run on shell startup for when terminal opens directly in a folder with .nvmrc
 
+# pi-coding-agent
+alias pi="NODE_NO_WARNINGS=1 npx -y @mariozechner/pi-coding-agent"
+
 # rust
 source_if_exists ${HOME}/.cargo/env
 

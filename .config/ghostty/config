@@ -1,0 +1,7 @@
+shell-integration-features = ssh-terminfo,ssh-env
+macos-option-as-alt = true
+
+keybind = shift+enter=text:\x1b\r
+keybind = ctrl+l=clear_screen
+
+window-padding-x = 14
