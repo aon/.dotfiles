@@ -100,6 +100,13 @@ source ${DOTFILES}/zsh/zsh-history-substring-search/zsh-history-substring-search
 
 ## Applications
 
+# actual cli
+actual() {
+  ACTUAL_SERVER_URL="https://actual.agustinaon.cloud" \
+  ACTUAL_PASSWORD="$(get_private_config ACTUAL_PASSWORD)" \
+  command actual "$@"
+}
+
 # binaries
 export PATH="$PATH:${HOME}/.local/bin"
 

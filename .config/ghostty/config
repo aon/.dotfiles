@@ -1,7 +1,38 @@
-shell-integration-features = ssh-terminfo,ssh-env
-macos-option-as-alt = true
+# Ghostty — https://ghostty.org/docs/config
 
-keybind = shift+enter=text:\x1b\r
-keybind = ctrl+l=clear_screen
+# Font
+font-family = JetBrains Mono
+font-size = 14
+# font-thicken = true
+# adjust-cell-height = 10%
 
+# Theme
+theme = TokyoNight
+background-opacity = 0.9
+background-blur-radius = 20
+minimum-contrast = 1.1
+
+# Window
 window-padding-x = 14
+window-padding-y = 10
+window-decoration = true
+macos-titlebar-style = tabs
+window-save-state = always
+
+# Cursor
+cursor-style = block
+cursor-style-blink = false
+shell-integration-features = cursor,sudo,title,ssh-terminfo,ssh-env
+
+# Clipboard
+copy-on-select = clipboard
+
+# Mouse
+mouse-hide-while-typing = true
+
+# Splits
+confirm-close-surface = false
+
+# Keybinds
+macos-option-as-alt = true
+keybind = ctrl+l=clear_screen
