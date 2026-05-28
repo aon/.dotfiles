@@ -105,7 +105,7 @@ source ${DOTFILES}/zsh/zsh-history-substring-search/zsh-history-substring-search
 actual() {
   ACTUAL_SERVER_URL="https://actual.agustinaon.cloud" \
   ACTUAL_PASSWORD="$(get_private_config ACTUAL_PASSWORD)" \
-  command pnpm --package=@actual-app/cli dlx actual "$@"
+  pnpm --package=@actual-app/cli dlx actual "$@"
 }
 
 # binaries
