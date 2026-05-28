@@ -8,8 +8,6 @@ font-size = 14
 
 # Theme
 theme = TokyoNight
-background-opacity = 0.9
-background-blur-radius = 20
 minimum-contrast = 1.1
 
 # Window

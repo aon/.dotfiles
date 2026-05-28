@@ -78,6 +78,7 @@ alias pip="pip3"
 alias python="python3"
 alias lg="lazygit"
 alias lzd="lazydocker"
+alias mp="mpcli"
 
 ## Source utils
 [ -f "${HOME}/.zshrc_utils" ] && source "${HOME}/.zshrc_utils"
@@ -104,7 +105,7 @@ source ${DOTFILES}/zsh/zsh-history-substring-search/zsh-history-substring-search
 actual() {
   ACTUAL_SERVER_URL="https://actual.agustinaon.cloud" \
   ACTUAL_PASSWORD="$(get_private_config ACTUAL_PASSWORD)" \
-  command actual "$@"
+  command pnpm --package=@actual-app/cli dlx actual "$@"
 }
 
 # binaries
