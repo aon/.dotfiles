@@ -105,7 +105,7 @@ source ${DOTFILES}/zsh/zsh-history-substring-search/zsh-history-substring-search
 actual() {
   ACTUAL_SERVER_URL="https://actual.agustinaon.cloud" \
   ACTUAL_PASSWORD="$(get_private_config ACTUAL_PASSWORD)" \
-  pnpm --package=@actual-app/cli dlx actual "$@"
+  command actual "$@"
 }
 
 # binaries
@@ -183,6 +183,9 @@ _auto_load_nvmrc() {
 }
 add-zsh-hook chpwd _auto_load_nvmrc
 _auto_load_nvmrc  # Also run on shell startup for when terminal opens directly in a folder with .nvmrc
+
+# notion cli
+eval "$(ntn completions zsh)"
 
 # pi-coding-agent
 alias pi="NODE_NO_WARNINGS=1 npx -y @mariozechner/pi-coding-agent"
