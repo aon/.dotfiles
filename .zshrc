@@ -21,8 +21,9 @@ zstyle ':completion:*' accept-exact '*(N)'
 zstyle ':completion:*' use-cache on
 zstyle ':completion:*' cache-path ${HOME}/.zsh_cache
 zstyle ':completion:*' menu no                                  # Disable menu completion in favor of fzf plugin
-zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls --color $realpath'  # Preview for fzf-tab
-zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls --color $realpath'  # Preview for zoxide
+zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always --icons=auto --group-directories-first $realpath'  # Preview for fzf-tab
+zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'eza -1 --color=always --icons=auto --group-directories-first $realpath'  # Preview for zoxide
+zstyle ':fzf-tab:*' continuous-trigger 'right'                  # → enters the highlighted directory and keeps completing
 
 WORDCHARS=${WORDCHARS//\/[&.;]}
 
@@ -71,8 +72,10 @@ bindkey '^[[B' history-substring-search-down
 ## Alias section
 alias cp="cp -i"                                                # Confirm before overwriting something
 alias df='df -h'                                                # Human-readable sizes
-alias ls="ls -G"                                                # macOS/BSD colored output
-alias ll='ls -l'
+alias ls="eza --group-directories-first --icons=auto"           # eza: modern ls replacement
+alias ll="eza -l --group-directories-first --icons=auto --git"  # long view with git status
+alias la="eza -la --group-directories-first --icons=auto --git" # long view including hidden
+alias lt="eza --tree --level=2 --icons=auto"                     # tree view (2 levels)
 alias vim="nvim"
 alias pip="pip3"
 alias python="python3"
@@ -116,6 +119,9 @@ export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
 BREW_PREFIX="/opt/homebrew"
 FPATH="${BREW_PREFIX}/share/zsh/site-functions:${FPATH}"
 export LIBRARY_PATH="${LIBRARY_PATH}:${BREW_PREFIX}/lib"
+
+# bun
+export PATH="$PATH:${HOME}/.bun/bin"
 
 # claude code
 claude() {
@@ -187,8 +193,6 @@ _auto_load_nvmrc  # Also run on shell startup for when terminal opens directly i
 # notion cli
 eval "$(ntn completions zsh)"
 
-# pi-coding-agent
-alias pi="NODE_NO_WARNINGS=1 npx -y @mariozechner/pi-coding-agent"
 
 # rust
 source_if_exists ${HOME}/.cargo/env
