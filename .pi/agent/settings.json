@@ -1,0 +1,19 @@
+{
+  "lastChangelogVersion": "0.80.2",
+  "theme": "dark",
+  "defaultProvider": "openai-codex",
+  "defaultModel": "gpt-5.5",
+  "defaultThinkingLevel": "xhigh",
+  "hideThinkingBlock": true,
+  "collapseChangelog": false,
+  "quietStartup": true,
+  "enableInstallTelemetry": false,
+  "defaultProjectTrust": "ask",
+  "treeFilterMode": "default",
+  "autocompleteMaxVisible": 20,
+  "packages": [
+    "npm:pi-web-access",
+    "npm:pi-subagents",
+    "npm:@juicesharp/rpiv-ask-user-question"
+  ]
+}

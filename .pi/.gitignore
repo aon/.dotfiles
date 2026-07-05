@@ -1,0 +1,19 @@
+# Allowlist: ignore everything, then re-include only what we track.
+# Guards against accidentally committing secrets (auth.json), session
+# logs, node_modules, checkpoints, or binaries if they ever land here.
+
+# Ignore everything by default
+*
+
+# Re-open the directories in the path so git can descend into them
+!agent/
+!agent/extensions/
+!agent/npm/
+
+# Re-include only the specific files we track
+!agent/settings.json
+!agent/extensions/*.ts
+!agent/npm/package.json
+
+# Keep this file tracked
+!.gitignore
