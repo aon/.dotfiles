@@ -1,0 +1,12 @@
+# Whitelist: this package must only ever hold hand-picked config.
+# Everything else in ~/.claude (secrets, caches, transcripts, plugins,
+# projects, sessions, logs) stays machine-local and is never tracked.
+*
+!.gitignore
+!settings.json
+!settings.local.json
+!keybindings.json
+# Add more as needed, e.g.:
+# !CLAUDE.md
+# !commands/
+# !agents/

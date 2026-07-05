@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git for-each-ref:*)",
+      "Bash(git worktree:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
