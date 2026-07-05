@@ -14,3 +14,6 @@ pnpm() { _load_nvm; pnpm "$@"; }
 pnpx() { _load_nvm; pnpx "$@"; }
 bun() { _load_nvm; bun "$@"; }
 bunx() { _load_nvm; bunx "$@"; }
+
+# Open Plannotator (and other PLANNOTATOR_BROWSER-aware tools) in Orca's built-in browser
+export PLANNOTATOR_BROWSER="${HOME}/.local/bin/plannotator-orca-open"

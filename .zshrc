@@ -213,7 +213,7 @@ fi
 
 ## Work related
 claude-msl() {
-  CLAUDE_CONFIG_DIR=${HOME}/Developer/msl/.claude \
+  #CLAUDE_CONFIG_DIR=${HOME}/Developer/msl/.claude \
   ANTHROPIC_BASE_URL=https://train.msldev.io \
   ANTHROPIC_AUTH_TOKEN="$(get_private_config MSL_ANTHROPIC_AUTH_TOKEN)" \
   claude  "$@"
