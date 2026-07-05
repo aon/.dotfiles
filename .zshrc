@@ -72,16 +72,21 @@ bindkey '^[[B' history-substring-search-down
 ## Alias section
 alias cp="cp -i"                                                # Confirm before overwriting something
 alias df='df -h'                                                # Human-readable sizes
-alias ls="eza --group-directories-first --icons=auto"           # eza: modern ls replacement
-alias ll="eza -l --group-directories-first --icons=auto --git"  # long view with git status
-alias la="eza -la --group-directories-first --icons=auto --git" # long view including hidden
-alias lt="eza --tree --level=2 --icons=auto"                     # tree view (2 levels)
-alias vim="nvim"
+if type eza &>/dev/null; then
+  alias ls="eza --group-directories-first --icons=auto"           # eza: modern ls replacement
+  alias ll="eza -l --group-directories-first --icons=auto --git"  # long view with git status
+  alias la="eza -la --group-directories-first --icons=auto --git" # long view including hidden
+  alias lt="eza --tree --level=2 --icons=auto"                    # tree view (2 levels)
+else
+  alias ll="ls -l"                                                # fall back to coreutils ls
+  alias la="ls -la"
+fi
+type nvim &>/dev/null && alias vim="nvim"
 alias pip="pip3"
 alias python="python3"
-alias lg="lazygit"
-alias lzd="lazydocker"
-alias mp="mpcli"
+type lazygit &>/dev/null && alias lg="lazygit"
+type lazydocker &>/dev/null && alias lzd="lazydocker"
+type mpcli &>/dev/null && alias mp="mpcli"
 
 ## Source utils
 [ -f "${HOME}/.zshrc_utils" ] && source "${HOME}/.zshrc_utils"
@@ -150,10 +155,10 @@ else
 fi
 
 # editor
-export EDITOR=nvim
+type nvim &>/dev/null && export EDITOR=nvim
 
 # fzf
-eval "$(fzf --zsh)"
+type fzf &>/dev/null && eval "$(fzf --zsh)"
 
 # foundry
 export PATH="$PATH:${HOME}/.foundry/bin"
@@ -191,23 +196,14 @@ add-zsh-hook chpwd _auto_load_nvmrc
 _auto_load_nvmrc  # Also run on shell startup for when terminal opens directly in a folder with .nvmrc
 
 # notion cli
-eval "$(ntn completions zsh)"
+type ntn &>/dev/null && eval "$(ntn completions zsh)"
 
 
 # rust
 source_if_exists ${HOME}/.cargo/env
 
-# yazi
-function y() {
-	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
-	command yazi "$@" --cwd-file="$tmp"
-	IFS= read -r -d '' cwd < "$tmp"
-	[ "$cwd" != "$PWD" ] && [ -d "$cwd" ] && builtin cd -- "$cwd"
-	rm -f -- "$tmp"
-}
-
 # zoxide
-if [[ "$CLAUDECODE" != "1" ]]; then
+if [[ "$CLAUDECODE" != "1" ]] && type zoxide &>/dev/null; then
   eval "$(zoxide init --cmd cd zsh)"
 fi
 
