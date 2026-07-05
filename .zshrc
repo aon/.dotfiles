@@ -128,12 +128,6 @@ export LIBRARY_PATH="${LIBRARY_PATH}:${BREW_PREFIX}/lib"
 # bun
 export PATH="$PATH:${HOME}/.bun/bin"
 
-# claude code
-claude() {
-  GITHUB_PERSONAL_ACCESS_TOKEN="$(get_private_config GITHUB_PERSONAL_ACCESS_TOKEN)" \
-  /Users/agustin/.local/bin/claude "$@"
-}
-
 # docker (regenerate completions when docker version changes)
 if type docker &> /dev/null; then
   local docker_comp="${HOME}/.docker/completions/_docker"
