@@ -213,3 +213,6 @@ codex-msl() {
   CODEX_HOME=${HOME}/Developer/msl/.codex \
   codex  "$@"
 }
+
+# Machine-local overrides (gitignored)
+source_if_exists ${DOTFILES}/.zshrc.local
