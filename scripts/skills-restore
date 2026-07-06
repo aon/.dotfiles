@@ -11,7 +11,11 @@
 #   scripts/skills-restore            reinstala todo
 #   scripts/skills-restore --dry-run  solo imprime lo que haria
 #
-set -euo pipefail
+# Nota: cada `skills add` puede reportar "Failed to install 1 -> PromptScript"
+# (ese agente no soporta scope global); es inofensivo. El script tolera fallos
+# parciales y sigue con el resto de los sources, avisando al final.
+#
+set -uo pipefail
 
 DIR="$(cd "$(dirname "$0")/.." && pwd)"
 LOCK="$DIR/.agents/.skill-lock.json"
@@ -21,8 +25,10 @@ DRY_RUN=0
 [ -f "$LOCK" ] || { echo "No existe el lock: $LOCK" >&2; exit 1; }
 
 # Agrupa las skills por source (ignora entradas node_modules) y emite
-# lineas "source<TAB>skill1,skill2,...".
-node -e '
+# lineas "source<TAB>skill1 skill2 ...". Los nombres van separados por espacio
+# porque el flag -s del CLI espera args separados, NO comma-separated.
+gen_pairs() {
+  node -e '
 const lock = require(process.argv[1]);
 const bySource = {};
 for (const [name, e] of Object.entries(lock.skills || {})) {
@@ -31,11 +37,28 @@ for (const [name, e] of Object.entries(lock.skills || {})) {
   (bySource[src] ||= []).push(name);
 }
 for (const [src, skills] of Object.entries(bySource))
-  console.log(src + "\t" + skills.join(","));
-' "$LOCK" | while IFS=$'\t' read -r source skills; do
+  console.log(src + "\t" + skills.join(" "));
+' "$LOCK"
+}
+
+# El loop lee los pares por el fd 3 (no por stdin): `npx skills add` consume
+# stdin para su TUI, y si el loop leyera por stdin le robaria las lineas
+# restantes y solo instalaria el primer source.
+failed=()
+while IFS=$'\t' read -r -u 3 source skills; do
+  [ -n "$source" ] || continue
   echo ">> npx skills add $source -g -s $skills -y"
   [ "$DRY_RUN" = 1 ] && continue
-  npx --yes skills add "$source" -g -s "$skills" -y
-done
+  # $skills SIN comillas a proposito: se expande en varios args (uno por skill).
+  if ! npx --yes skills add "$source" -g -s $skills -y; then
+    echo "   ⚠ fallo parcial en $source — sigo con el resto"
+    failed+=("$source")
+  fi
+done 3< <(gen_pairs)
 
-echo "Listo."
+if [ "${#failed[@]}" -gt 0 ]; then
+  echo "Terminado con avisos en: ${failed[*]}"
+  echo "(revisa esos sources; el resto quedo instalado)"
+else
+  echo "Listo. Todas las skills reinstaladas."
+fi
