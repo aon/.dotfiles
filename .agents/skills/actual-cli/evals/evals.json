@@ -1,0 +1,50 @@
+{
+  "skill_name": "actual-cli",
+  "evals": [
+    {
+      "id": 0,
+      "name": "spend-on-groceries-last-month",
+      "prompt": "How much did I spend on groceries last month? Today is 2026-05-28.",
+      "expected_output": "A clear dollar figure for April 2026 spending in the Groceries category, formatted in dollars (not cents), with split transactions handled correctly (is_parent:false) so nothing is double-counted.",
+      "files": [],
+      "assertions": [
+        {"text": "Answer shows a dollar amount formatted with $ and decimal cents (e.g. $123.45)"},
+        {"text": "Answer identifies the time range as April 2026 (or 2026-04)"},
+        {"text": "Answer does NOT report a raw-cents integer as if it were dollars (no 5+ digit number presented as the spend figure without a decimal)"},
+        {"text": "Commands used at least one `actual` invocation that filters with `is_parent: false` to avoid double-counting splits"},
+        {"text": "Commands resolved the Groceries category by ID or queried by `category.name` rather than guessing"},
+        {"text": "Commands used a single aggregate AQL query (not a loop of one-per-day or one-per-tx queries)"}
+      ]
+    },
+    {
+      "id": 1,
+      "name": "top-5-spending-categories-ytd",
+      "prompt": "What are my top 5 spending categories so far this year? Show me a table sorted by total spent, most first. Today is 2026-05-28.",
+      "expected_output": "A table showing 5 category names with totals in dollars (not cents), ranked by largest spend. Should aggregate via AQL groupBy on category.name with $sum on amount, filter to expenses only (amount < 0), is_parent:false, date range 2026-01-01 to 2026-05-28.",
+      "files": [],
+      "assertions": [
+        {"text": "Answer is presented as a table (markdown table or similar tabular layout)"},
+        {"text": "Answer shows 5 or fewer category rows"},
+        {"text": "Amounts in the table are in dollars with decimals (not raw integer cents)"},
+        {"text": "Table is ordered so the largest spend is first"},
+        {"text": "Commands used a single AQL groupBy aggregate query (not 5+ separate per-category queries)"},
+        {"text": "Commands filtered with `is_parent: false` to avoid double-counting splits"},
+        {"text": "Date range used is 2026-01-01 through approximately 2026-05-28"}
+      ]
+    },
+    {
+      "id": 2,
+      "name": "uncategorized-transactions-this-month",
+      "prompt": "List my uncategorized transactions from this month so I can clean them up. Today is 2026-05-28.",
+      "expected_output": "A list of transactions where category IS NULL (not the string 'Uncategorized') for the date range 2026-05-01 to 2026-05-28, with payee.name and amount visible in dollars, ordered by date. Should NOT include parent split rows.",
+      "files": [],
+      "assertions": [
+        {"text": "Commands filter with `category: null` (the correct way to find uncategorized) — NOT by searching for a category named 'Uncategorized'"},
+        {"text": "Date range filter is May 2026 (2026-05-01 onward)"},
+        {"text": "Answer is a list or table the user can act on (shows date, payee, amount at minimum)"},
+        {"text": "Amounts shown to the user are in dollars (with decimals), not raw integer cents"},
+        {"text": "Commands filtered with `is_parent: false` (or otherwise avoided showing split parents)"}
+      ]
+    }
+  ]
+}
