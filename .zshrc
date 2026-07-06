@@ -214,5 +214,5 @@ codex-msl() {
   codex  "$@"
 }
 
-# Machine-local overrides (gitignored)
+## Machine-local overrides
 source_if_exists ${DOTFILES}/.zshrc.local
