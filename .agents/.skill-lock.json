@@ -170,15 +170,6 @@
       "installedAt": "2026-06-07T22:19:13.304Z",
       "updatedAt": "2026-06-07T22:19:13.304Z"
     },
-    "plannotator-visual-explainer": {
-      "source": "backnotprop/plannotator",
-      "sourceType": "github",
-      "sourceUrl": "https://github.com/backnotprop/plannotator.git",
-      "skillPath": "apps/skills/extra/plannotator-visual-explainer/SKILL.md",
-      "skillFolderHash": "a48af6a5c5e110a538af6174f485cfd4e5b9d276",
-      "installedAt": "2026-06-10T19:28:35.865Z",
-      "updatedAt": "2026-06-10T19:28:35.865Z"
-    },
     "to-prd": {
       "source": "mattpocock/skills",
       "sourceType": "github",
