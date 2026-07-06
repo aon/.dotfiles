@@ -24,6 +24,20 @@ DRY_RUN=0
 
 [ -f "$LOCK" ] || { echo "No existe el lock: $LOCK" >&2; exit 1; }
 
+# Instalar solo a los agentes que usas (lastSelectedAgents del lock), con un
+# -a por agente (el CLI NO acepta -a comma/space-separated, solo repetido).
+# Esto ademas evita PromptScript, que no soporta scope global y ensuciaba la
+# salida con un "Failed to install" por cada skill.
+AGENT_FLAGS=()
+while IFS= read -r ag; do
+  [ -n "$ag" ] && AGENT_FLAGS+=(-a "$ag")
+done < <(node -e '
+const a = (require(process.argv[1]).lastSelectedAgents || ["claude-code"])
+  .filter(x => x !== "promptscript");
+for (const x of a) console.log(x);
+' "$LOCK")
+[ "${#AGENT_FLAGS[@]}" -eq 0 ] && AGENT_FLAGS=(-a claude-code)
+
 # Agrupa las skills por source (ignora entradas node_modules) y emite
 # lineas "source<TAB>skill1 skill2 ...". Los nombres van separados por espacio
 # porque el flag -s del CLI espera args separados, NO comma-separated.
@@ -47,10 +61,10 @@ for (const [src, skills] of Object.entries(bySource))
 failed=()
 while IFS=$'\t' read -r -u 3 source skills; do
   [ -n "$source" ] || continue
-  echo ">> npx skills add $source -g -s $skills -y"
+  echo ">> npx skills add $source -g -s $skills ${AGENT_FLAGS[*]} -y"
   [ "$DRY_RUN" = 1 ] && continue
   # $skills SIN comillas a proposito: se expande en varios args (uno por skill).
-  if ! npx --yes skills add "$source" -g -s $skills -y; then
+  if ! npx --yes skills add "$source" -g -s $skills "${AGENT_FLAGS[@]}" -y; then
     echo "   ⚠ fallo parcial en $source — sigo con el resto"
     failed+=("$source")
   fi
