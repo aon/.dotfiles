@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+#
+# Reinstala todas las skills del registro a scope global desde el lock
+# committeado (.agents/.skill-lock.json).
+#
+# El CLI de `npx skills` NO tiene un restore-desde-lock para skills globales
+# (experimental_install solo lee el lock de project: <cwd>/skills-lock.json).
+# Esto replica su logica interna (agrupar por source -> skills add) pero con -g.
+#
+# Uso:
+#   scripts/skills-restore            reinstala todo
+#   scripts/skills-restore --dry-run  solo imprime lo que haria
+#
+set -euo pipefail
+
+DIR="$(cd "$(dirname "$0")/.." && pwd)"
+LOCK="$DIR/.agents/.skill-lock.json"
+DRY_RUN=0
+[ "${1:-}" = "--dry-run" ] && DRY_RUN=1
+
+[ -f "$LOCK" ] || { echo "No existe el lock: $LOCK" >&2; exit 1; }
+
+# Agrupa las skills por source (ignora entradas node_modules) y emite
+# lineas "source<TAB>skill1,skill2,...".
+node -e '
+const lock = require(process.argv[1]);
+const bySource = {};
+for (const [name, e] of Object.entries(lock.skills || {})) {
+  if (e.sourceType === "node_modules") continue;
+  const src = e.ref ? `${e.source}#${e.ref}` : e.source;
+  (bySource[src] ||= []).push(name);
+}
+for (const [src, skills] of Object.entries(bySource))
+  console.log(src + "\t" + skills.join(","));
+' "$LOCK" | while IFS=$'\t' read -r source skills; do
+  echo ">> npx skills add $source -g -s $skills -y"
+  [ "$DRY_RUN" = 1 ] && continue
+  npx --yes skills add "$source" -g -s "$skills" -y
+done
+
+echo "Listo."
