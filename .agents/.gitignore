@@ -1,0 +1,6 @@
+# Las skills del registry se regeneran desde .skill-lock.json con
+# `npx skills experimental_install`. Solo trackeamos el lockfile y las
+# skills propias (sin source), que no se pueden regenerar.
+/skills/*
+!/skills/actual-cli/
+!/skills/code-with-review/
