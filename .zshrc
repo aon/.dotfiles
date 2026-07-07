@@ -214,5 +214,13 @@ codex-msl() {
   codex  "$@"
 }
 
+# GitHub MCP plugin auth: reuse the gh CLI token as a Bearer for the
+# official GitHub MCP server. Guarded so shells on machines without gh
+# (or not logged in) don't error or add startup latency.
+if command -v gh >/dev/null 2>&1; then
+  GITHUB_PERSONAL_ACCESS_TOKEN=$(gh auth token 2>/dev/null) && \
+    export GITHUB_PERSONAL_ACCESS_TOKEN
+fi
+
 ## Machine-local overrides
 source_if_exists ${DOTFILES}/.zshrc.local
