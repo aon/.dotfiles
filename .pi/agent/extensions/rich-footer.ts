@@ -103,21 +103,24 @@ export default function (pi: ExtensionAPI) {
 					const branchText = branch || "no-git";
 					const prLabel = prInfo?.state === "found" ? `#${prInfo.number}` : prInfo?.state === "loading" ? "…" : "no PR";
 					const prText = prInfo?.state === "found" ? link(prLabel, prInfo.url) : prLabel;
+					const extensionStatuses = [...footerData.getExtensionStatuses().values()].filter((status) => status.length > 0);
 
 					const effortColor = effort === "off" || effort === "minimal" ? "dim" : (`thinking${effort[0].toUpperCase()}${effort.slice(1)}` as any);
 					const contextColor = typeof usage?.percent === "number" && usage.percent >= 85 ? "error" : typeof usage?.percent === "number" && usage.percent >= 60 ? "warning" : "success";
 					const segment = (icon: string, value: string, color: string = "accent") => `${theme.fg(color as any, icon)} ${theme.fg("muted", value)}`;
 					const sep = theme.fg("dim", " · ");
 
+					const branchWithStatuses = theme.fg("muted", branchText) + extensionStatuses.map((status) => ` ${status}`).join("");
+					const branchSegment = `${theme.fg("mdLink", icons.branch)} ${branchWithStatuses}`;
 					const fullParts = [
 						segment(icons.model, model, "accent"),
 						segment(icons.effort, effort, effortColor),
 						segment(icons.context, context, contextColor),
-						segment(icons.branch, branchText, "mdLink"),
+						branchSegment,
 						segment(prInfo?.state === "found" ? icons.pr : icons.none, prText, prInfo?.state === "found" ? "success" : "dim"),
 					];
-					const compactParts = [fullParts[0], fullParts[1], fullParts[2], fullParts[3], fullParts[4]];
-					const tinyParts = [theme.fg("muted", model), theme.fg(contextColor as any, context), theme.fg("muted", branchText), prInfo?.state === "found" ? theme.fg("success", prText) : theme.fg("dim", icons.none)];
+					const compactParts = fullParts;
+					const tinyParts = [theme.fg("muted", model), theme.fg(contextColor as any, context), branchWithStatuses, prInfo?.state === "found" ? theme.fg("success", prText) : theme.fg("dim", icons.none)];
 
 					const fullLine = fullParts.join(sep);
 					const compactLine = compactParts.join(sep);
