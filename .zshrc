@@ -189,10 +189,6 @@ _auto_load_nvmrc() {
 add-zsh-hook chpwd _auto_load_nvmrc
 _auto_load_nvmrc  # Also run on shell startup for when terminal opens directly in a folder with .nvmrc
 
-# notion cli
-type ntn &>/dev/null && eval "$(ntn completions zsh)"
-
-
 # rust
 source_if_exists ${HOME}/.cargo/env
 
