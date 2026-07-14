@@ -2,9 +2,10 @@
   "name": "pi-extensions",
   "private": true,
   "dependencies": {
+    "@firstpick/pi-themes-bundle": "^0.1.4",
     "@juicesharp/rpiv-ask-user-question": "^1.20.0",
     "@juicesharp/rpiv-todo": "^1.20.0",
-    "@plannotator/pi-extension": "^0.22.0",
+    "@plannotator/pi-extension": "^0.23.1",
     "pi-subagents": "^0.34.0",
     "pi-web-access": "^0.13.0"
   }

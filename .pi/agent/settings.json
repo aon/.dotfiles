@@ -1,11 +1,11 @@
 {
-  "lastChangelogVersion": "0.80.3",
+  "lastChangelogVersion": "0.80.6",
   "theme": "dark",
   "defaultProvider": "openai-codex",
-  "defaultModel": "gpt-5.5",
+  "defaultModel": "gpt-5.6-sol",
   "defaultThinkingLevel": "high",
   "hideThinkingBlock": true,
-  "collapseChangelog": false,
+  "collapseChangelog": true,
   "quietStartup": true,
   "enableInstallTelemetry": false,
   "defaultProjectTrust": "ask",
@@ -15,6 +15,14 @@
     "npm:pi-web-access",
     "npm:pi-subagents",
     "npm:@juicesharp/rpiv-ask-user-question",
-    "npm:@plannotator/pi-extension"
+    "npm:@plannotator/pi-extension",
+    "npm:@firstpick/pi-themes-bundle@0.1.4"
+  ],
+  "terminal": {
+    "showTerminalProgress": true
+  },
+  "enabledModels": [
+    "openai-codex/gpt-5.6-sol",
+    "openai-codex/gpt-5.6-terra"
   ]
 }

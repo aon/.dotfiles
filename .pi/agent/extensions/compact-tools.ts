@@ -1,4 +1,6 @@
+import { isAbsolute, relative } from "node:path"
 import {
+  type AgentToolResult,
   createBashToolDefinition,
   createEditToolDefinition,
   createFindToolDefinition,
@@ -6,334 +8,465 @@ import {
   createLsToolDefinition,
   createReadToolDefinition,
   createWriteToolDefinition,
-  formatSize,
-  renderDiff,
-  type AgentToolResult,
-  type BashToolDetails,
-  type EditToolDetails,
   type ExtensionAPI,
-  type FindToolDetails,
-  type GrepToolDetails,
-  type LsToolDetails,
-  type ReadToolDetails,
-} from "@earendil-works/pi-coding-agent";
-import { Container, Text, truncateToWidth } from "@earendil-works/pi-tui";
-import { isAbsolute, relative } from "node:path";
+  formatSize,
+  type SessionEntry,
+  type Theme,
+  type ToolDefinition,
+  type ToolRenderResultOptions,
+} from "@earendil-works/pi-coding-agent"
+import {
+  type Component,
+  Container,
+  truncateToWidth,
+} from "@earendil-works/pi-tui"
+import type { TSchema } from "typebox"
 
-type ThemeLike = {
-  fg(color: string, text: string): string;
-  bold(text: string): string;
-};
+type GroupKind = "read" | "bash" | "changes" | "list" | "find" | "grep"
+type ItemStatus = "pending" | "success" | "error"
+type ToolName = "read" | "bash" | "edit" | "write" | "ls" | "find" | "grep"
+type ToolArguments = Record<string, unknown>
+type GroupedRenderContext = {
+  args: ToolArguments
+  toolCallId: string
+  lastComponent: Component | undefined
+  isError: boolean
+}
+type ToolGroupItem = {
+  toolCallId: string
+  toolName: ToolName
+  action?: string
+  target: string
+  metadata?: string
+  status: ItemStatus
+  error?: string
+  group: ToolGroup
+}
+type ToolGroup = {
+  id: number
+  kind: GroupKind
+  items: ToolGroupItem[]
+}
 
-type RenderContext = {
-  args: any;
-  cwd: string;
-  state: Record<string, any>;
-  expanded: boolean;
-  isPartial: boolean;
-  isError: boolean;
-  executionStarted: boolean;
-  invalidate(): void;
-};
+const GROUP_LABELS: Record<GroupKind, string> = {
+  read: "Read",
+  bash: "Bash",
+  changes: "Changes",
+  list: "List",
+  find: "Find",
+  grep: "Grep",
+}
+const SUPPORTED_TOOLS = new Set<ToolName>([
+  "read",
+  "bash",
+  "edit",
+  "write",
+  "ls",
+  "find",
+  "grep",
+])
 
-function textOutput(result: AgentToolResult<any> | undefined): string {
-  if (!result) return "";
+export default function compactToolsExtension(pi: ExtensionAPI) {
+  let groups: ToolGroupManager | undefined
+
+  pi.on("session_start", (_event, ctx) => {
+    groups = new ToolGroupManager(ctx.cwd)
+    groups.restore(ctx.sessionManager.getBranch())
+    registerGroupedTools(pi, ctx.cwd, groups)
+  })
+
+  pi.on("before_agent_start", () => {
+    groups?.breakGroup()
+  })
+}
+
+function registerGroupedTools(
+  pi: ExtensionAPI,
+  cwd: string,
+  groups: ToolGroupManager,
+): void {
+  pi.registerTool(groupedTool(createReadToolDefinition(cwd), "read", groups))
+  pi.registerTool(groupedTool(createBashToolDefinition(cwd), "bash", groups))
+  pi.registerTool(groupedTool(createEditToolDefinition(cwd), "edit", groups))
+  pi.registerTool(groupedTool(createWriteToolDefinition(cwd), "write", groups))
+  pi.registerTool(groupedTool(createLsToolDefinition(cwd), "ls", groups))
+  pi.registerTool(groupedTool(createFindToolDefinition(cwd), "find", groups))
+  pi.registerTool(groupedTool(createGrepToolDefinition(cwd), "grep", groups))
+}
+
+function groupedTool<TParams extends TSchema, TDetails, TState>(
+  base: ToolDefinition<TParams, TDetails, TState>,
+  toolName: ToolName,
+  groups: ToolGroupManager,
+): ToolDefinition<TParams, TDetails, TState> {
+  return {
+    ...base,
+    renderShell: "self",
+    renderCall(args, theme, context) {
+      return groups.renderCall(toolName, asArguments(args), theme, {
+        args: asArguments(args),
+        toolCallId: context.toolCallId,
+        lastComponent: context.lastComponent,
+        isError: context.isError,
+      })
+    },
+    renderResult(result, options, theme, context) {
+      groups.recordResult(toolName, result, options, {
+        args: asArguments(context.args),
+        toolCallId: context.toolCallId,
+        lastComponent: context.lastComponent,
+        isError: context.isError,
+      })
+      if (options.expanded) {
+        return base.renderResult?.(result, options, theme, context) ?? hidden()
+      }
+      return hidden()
+    },
+  }
+}
+
+class ToolGroupManager {
+  private readonly itemsByCallId = new Map<string, ToolGroupItem>()
+  private currentGroup: ToolGroup | undefined
+  private nextGroupId = 1
+
+  constructor(private readonly cwd: string) {}
+
+  restore(entries: readonly SessionEntry[]): void {
+    for (const entry of entries) {
+      if (entry?.type !== "message") {
+        continue
+      }
+      if (entry.message?.role === "user") {
+        this.breakGroup()
+        continue
+      }
+      if (entry.message?.role !== "assistant") {
+        continue
+      }
+
+      const content = Array.isArray(entry.message.content)
+        ? entry.message.content
+        : []
+      for (const part of content) {
+        if (
+          part?.type === "toolCall" &&
+          isToolName(part.name) &&
+          typeof part.id === "string"
+        ) {
+          this.ensureItem(part.name, part.id, asArguments(part.arguments))
+        } else if (part?.type === "text" && part.text?.trim()) {
+          this.breakGroup()
+        } else if (part?.type === "toolCall") {
+          this.breakGroup()
+        }
+      }
+    }
+  }
+
+  breakGroup(): void {
+    this.currentGroup = undefined
+  }
+
+  renderCall(
+    toolName: ToolName,
+    args: ToolArguments,
+    theme: Theme,
+    context: GroupedRenderContext,
+  ): Component {
+    const item = this.ensureItem(toolName, context.toolCallId, args)
+    if (item.group.items[0] !== item) {
+      return hidden()
+    }
+
+    const previous = context.lastComponent
+    if (
+      previous instanceof ToolGroupComponent &&
+      previous.groupId === item.group.id
+    ) {
+      previous.setTheme(theme)
+      return previous
+    }
+    return new ToolGroupComponent(item.group, theme)
+  }
+
+  recordResult(
+    toolName: ToolName,
+    result: AgentToolResult<unknown>,
+    options: ToolRenderResultOptions,
+    context: GroupedRenderContext,
+  ): void {
+    const item = this.ensureItem(toolName, context.toolCallId, context.args)
+    item.status = options.isPartial
+      ? "pending"
+      : context.isError
+        ? "error"
+        : "success"
+    item.error = context.isError ? errorSummary(result) : undefined
+    item.metadata = mutationMetadata(toolName, context.args, result)
+  }
+
+  private ensureItem(
+    toolName: ToolName,
+    toolCallId: string,
+    args: ToolArguments,
+  ): ToolGroupItem {
+    const existing = this.itemsByCallId.get(toolCallId)
+    if (existing) {
+      const description = describeTool(toolName, args, this.cwd)
+      existing.action = description.action
+      existing.target = description.target
+      return existing
+    }
+
+    const kind = groupKind(toolName)
+    if (!this.currentGroup || this.currentGroup.kind !== kind) {
+      this.currentGroup = { id: this.nextGroupId++, kind, items: [] }
+    }
+
+    const description = describeTool(toolName, args, this.cwd)
+    const item: ToolGroupItem = {
+      toolCallId,
+      toolName,
+      action: description.action,
+      target: description.target,
+      status: "pending",
+      group: this.currentGroup,
+    }
+    this.currentGroup.items.push(item)
+    this.itemsByCallId.set(toolCallId, item)
+    return item
+  }
+}
+
+class ToolGroupComponent implements Component {
+  constructor(
+    private readonly group: ToolGroup,
+    private theme: Theme,
+  ) {}
+
+  get groupId(): number {
+    return this.group.id
+  }
+
+  setTheme(theme: Theme): void {
+    this.theme = theme
+  }
+
+  render(width: number): string[] {
+    const lines = [
+      truncateToWidth(groupHeader(this.theme, this.group), width, "…"),
+    ]
+    for (const [index, item] of this.group.items.entries()) {
+      const last = index === this.group.items.length - 1
+      lines.push(
+        truncateToWidth(groupItemLine(this.theme, item, last), width, "…"),
+      )
+      if (item.error) {
+        lines.push(
+          truncateToWidth(
+            groupErrorLine(this.theme, item.error, last),
+            width,
+            "…",
+          ),
+        )
+      }
+    }
+    return lines
+  }
+
+  invalidate(): void {}
+}
+
+function groupHeader(theme: Theme, group: ToolGroup): string {
+  const status = groupStatus(group)
+  const color =
+    status === "error" ? "error" : status === "success" ? "success" : "muted"
+  return `${theme.fg(color, "●")} ${theme.fg("toolTitle", theme.bold(GROUP_LABELS[group.kind]))}`
+}
+
+function groupItemLine(
+  theme: Theme,
+  item: ToolGroupItem,
+  last: boolean,
+): string {
+  const connector = last ? "└─" : "├─"
+  const action = item.action ? `${theme.fg("toolTitle", item.action)} ` : ""
+  const metadata = item.metadata ? theme.fg("dim", ` · ${item.metadata}`) : ""
+  const error = item.status === "error" ? ` ${theme.fg("error", "✗")}` : ""
+  return `  ${theme.fg("dim", connector)} ${action}${theme.fg("accent", item.target)}${metadata}${error}`
+}
+
+function groupErrorLine(theme: Theme, error: string, last: boolean): string {
+  const stem = last ? "   " : "│  "
+  return `  ${theme.fg("dim", stem)} ${theme.fg("dim", "└─")} ${theme.fg("error", error)}`
+}
+
+function groupStatus(group: ToolGroup): ItemStatus {
+  if (group.items.some((item) => item.status === "error")) {
+    return "error"
+  }
+  if (group.items.every((item) => item.status === "success")) {
+    return "success"
+  }
+  return "pending"
+}
+
+function groupKind(toolName: ToolName): GroupKind {
+  if (toolName === "edit" || toolName === "write") {
+    return "changes"
+  }
+  return toolName
+}
+
+function describeTool(
+  toolName: ToolName,
+  args: ToolArguments,
+  cwd: string,
+): { action?: string; target: string } {
+  if (toolName === "read") {
+    return { target: displayPath(args.path ?? args.file_path, cwd) }
+  }
+  if (toolName === "bash") {
+    return { target: cropBashCommand(stringArgument(args.command)) || "…" }
+  }
+  if (toolName === "edit" || toolName === "write") {
+    return {
+      action: toolName === "edit" ? "Edit" : "Write",
+      target: displayPath(args.path ?? args.file_path, cwd),
+    }
+  }
+  if (toolName === "ls") {
+    return { target: displayPath(args.path || ".", cwd) }
+  }
+  if (toolName === "find") {
+    return {
+      target: `${stringArgument(args.pattern) || "…"} in ${displayPath(args.path || ".", cwd)}`,
+    }
+  }
+  return {
+    target: `/${stringArgument(args.pattern) || "…"}/ in ${displayPath(args.path || ".", cwd)}`,
+  }
+}
+
+function mutationMetadata<TDetails>(
+  toolName: ToolName,
+  args: ToolArguments,
+  result: AgentToolResult<TDetails>,
+): string | undefined {
+  if (toolName === "write") {
+    const content = stringArgument(args.content)
+    return `${formatSize(Buffer.byteLength(content, "utf8"))} · ${plural(lineCount(content), "line")}`
+  }
+  if (toolName !== "edit") {
+    return undefined
+  }
+
+  const details = result.details as { diff?: string } | undefined
+  const stats = diffStats(details?.diff)
+  if (!stats.added && !stats.removed) {
+    return undefined
+  }
+  return `+${stats.added} −${stats.removed}`
+}
+
+function errorSummary<TDetails>(result: AgentToolResult<TDetails>): string {
+  const output = textOutput(result)
+  return oneLine(
+    output.split("\n").filter(Boolean).at(-1) ?? "Tool failed",
+    120,
+  )
+}
+
+function diffStats(diff: string | undefined): {
+  added: number
+  removed: number
+} {
+  if (!diff) {
+    return { added: 0, removed: 0 }
+  }
+
+  let added = 0
+  let removed = 0
+  for (const line of diff.split("\n")) {
+    if (/^\+\s*\d*\s/.test(line) || /^\+[^+]/.test(line)) {
+      added++
+    } else if (/^-\s*\d*\s/.test(line) || /^-[^-]/.test(line)) {
+      removed++
+    }
+  }
+  return { added, removed }
+}
+
+function textOutput<TDetails>(
+  result: AgentToolResult<TDetails> | undefined,
+): string {
+  if (!result) {
+    return ""
+  }
   return result.content
-    .map((part: any) => {
-      if (part?.type === "text") return part.text ?? "";
-      if (part?.type === "image") return `[image${part.mimeType ? `: ${part.mimeType}` : ""}]`;
-      return "";
+    .map((part) => {
+      if (part.type === "text") {
+        return part.text
+      }
+      return `[image${part.mimeType ? `: ${part.mimeType}` : ""}]`
     })
     .filter(Boolean)
-    .join("\n");
-}
-
-function lineCount(text: string): number {
-  if (!text) return 0;
-  const trimmed = text.endsWith("\n") ? text.slice(0, -1) : text;
-  if (!trimmed) return 0;
-  return trimmed.split("\n").length;
-}
-
-function plural(count: number, singular: string, pluralForm = `${singular}s`): string {
-  return `${count} ${count === 1 ? singular : pluralForm}`;
+    .join("\n")
 }
 
 function displayPath(raw: unknown, cwd: string): string {
-  const path = typeof raw === "string" ? raw : "";
-  if (!path) return "…";
-  if (!isAbsolute(path)) return path;
-  const rel = relative(cwd, path);
-  return rel && !rel.startsWith("..") ? rel : path;
-}
-
-function oneLine(value: string, max = 96): string {
-  const compact = value.replace(/\s+/g, " ").trim();
-  return compact.length > max ? `${compact.slice(0, Math.max(0, max - 1))}…` : compact;
-}
-
-function markerColor(context: RenderContext): "success" | "error" | "muted" {
-  if (context.isError) return "error";
-  if (context.isPartial) return "muted";
-  return "success";
-}
-
-function header(theme: ThemeLike, action: string, target: string, context: RenderContext): string {
-  return `${theme.fg(markerColor(context), "●")} ${theme.fg("toolTitle", theme.bold(action))} ${theme.fg("accent", target)}`;
-}
-
-function resultLine(theme: ThemeLike, summary: string, _kind: "success" | "error" | "muted" = "muted"): string {
-  return `  ${theme.fg("dim", "└─")} ${theme.fg("dim", summary)}`;
-}
-
-function asText(text: string): Text {
-  return new Text(text, 0, 0);
-}
-
-function expandedBlock(theme: ThemeLike, title: string, body: string, maxWidth?: number): Container {
-  const container = new Container();
-  container.addChild(asText(resultLine(theme, title, "muted")));
-  if (body) {
-    container.addChild(asText(`\n${body}`));
+  const path = stringArgument(raw)
+  if (!path) {
+    return "…"
   }
-  return container;
-}
-
-function readSummary(result: AgentToolResult<ReadToolDetails | undefined>, args: any): string {
-  const truncation = result.details?.truncation;
-  if (truncation?.truncated) {
-    return `Read ${truncation.outputLines} of ${truncation.totalLines} lines`;
+  if (!isAbsolute(path)) {
+    return path
   }
-
-  const output = textOutput(result);
-  if (/^Read image file/m.test(output)) return output.split("\n")[0] ?? "Read image";
-
-  const explicitLimit = typeof args?.limit === "number" ? args.limit : undefined;
-  const count = lineCount(output.replace(/\n\n\[[^\]]+\]$/s, ""));
-  return `Read ${plural(explicitLimit ? Math.min(explicitLimit, count || explicitLimit) : count, "line")}`;
+  const relativePath = relative(cwd, path)
+  return relativePath && !relativePath.startsWith("..") ? relativePath : path
 }
 
-function writeSummary(args: any): string {
-  const content = typeof args?.content === "string" ? args.content : "";
-  const bytes = Buffer.byteLength(content, "utf8");
-  return `Wrote ${formatSize(bytes)} · ${plural(lineCount(content), "line")}`;
+function cropBashCommand(command: string): string {
+  const compact = command.replace(/\s+/g, " ").trim()
+  return compact.length > 80 ? `${compact.slice(0, 80)}...` : compact
 }
 
-function diffStats(diff: string | undefined): { added: number; removed: number } {
-  if (!diff) return { added: 0, removed: 0 };
-  let added = 0;
-  let removed = 0;
-  for (const line of diff.split("\n")) {
-    if (/^\+\s*\d*\s/.test(line) || /^\+[^+]/.test(line)) added++;
-    else if (/^-\s*\d*\s/.test(line) || /^-[^-]/.test(line)) removed++;
+function oneLine(value: string, max = 160): string {
+  const compact = value.replace(/\s+/g, " ").trim()
+  return compact.length > max
+    ? `${compact.slice(0, Math.max(0, max - 1))}…`
+    : compact
+}
+
+function lineCount(text: string): number {
+  if (!text) {
+    return 0
   }
-  return { added, removed };
+  const trimmed = text.endsWith("\n") ? text.slice(0, -1) : text
+  return trimmed ? trimmed.split("\n").length : 0
 }
 
-function editSummary(args: any, result: AgentToolResult<EditToolDetails | undefined>): string {
-  const edits = Array.isArray(args?.edits) ? args.edits.length : args?.oldText && args?.newText ? 1 : 0;
-  const stats = diffStats(result.details?.diff);
-  const parts = [plural(edits, "replacement")];
-  if (stats.added || stats.removed) parts.push(`+${stats.added} -${stats.removed}`);
-  return parts.join(" · ");
-}
-
-function bashSummary(
-  result: AgentToolResult<BashToolDetails | undefined>,
-  context: RenderContext,
+function plural(
+  count: number,
+  singular: string,
+  pluralForm = `${singular}s`,
 ): string {
-  const output = textOutput(result).trim();
-  const truncation = result.details?.truncation;
-  const lines = truncation?.totalLines ?? lineCount(output === "(no output)" ? "" : output);
-
-  const startedAt = context.state.startedAt as number | undefined;
-  const endedAt = context.state.endedAt as number | undefined;
-  const elapsed = startedAt ? `${(((endedAt ?? Date.now()) - startedAt) / 1000).toFixed(1)}s` : undefined;
-
-  if (context.isPartial) {
-    return ["Running", elapsed, lines ? plural(lines, "line") : undefined].filter(Boolean).join(" · ");
-  }
-
-  if (context.isError) {
-    const lastLine = output.split("\n").filter(Boolean).at(-1) ?? "Command failed";
-    return [oneLine(lastLine, 72), elapsed, lines ? plural(lines, "line") : undefined].filter(Boolean).join(" · ");
-  }
-
-  return ["Exit 0", elapsed, lines ? plural(lines, "line") : "no output"].filter(Boolean).join(" · ");
+  return `${count} ${count === 1 ? singular : pluralForm}`
 }
 
-function compactReadRenderer(base: ReturnType<typeof createReadToolDefinition>) {
-  return {
-    ...base,
-    renderShell: "self" as const,
-    renderCall(args: any, theme: any, context: RenderContext) {
-      return asText(header(theme, "Read", displayPath(args?.path ?? args?.file_path, context.cwd), context));
-    },
-    renderResult(result: AgentToolResult<ReadToolDetails | undefined>, options: any, theme: any, context: RenderContext) {
-      if (context.isError) return asText(resultLine(theme, oneLine(textOutput(result) || "Read failed", 140), "error"));
-      if (options.expanded) {
-        const expanded = base.renderResult?.(result as any, options, theme, context as any);
-        const container = new Container();
-        container.addChild(asText(resultLine(theme, readSummary(result, context.args), "success")));
-        if (expanded) container.addChild(expanded);
-        return container;
-      }
-      return asText(resultLine(theme, readSummary(result, context.args), "success"));
-    },
-  };
+function stringArgument(value: unknown): string {
+  return typeof value === "string" ? value : ""
 }
 
-function compactWriteRenderer(base: ReturnType<typeof createWriteToolDefinition>) {
-  return {
-    ...base,
-    renderShell: "self" as const,
-    renderCall(args: any, theme: any, context: RenderContext) {
-      return asText(header(theme, "Write", displayPath(args?.path ?? args?.file_path, context.cwd), context));
-    },
-    renderResult(result: AgentToolResult<undefined>, options: any, theme: any, context: RenderContext) {
-      if (context.isError) return asText(resultLine(theme, oneLine(textOutput(result) || "Write failed", 140), "error"));
-      if (options.expanded && typeof context.args?.content === "string") {
-        return expandedBlock(theme, writeSummary(context.args), theme.fg("toolOutput", context.args.content));
-      }
-      return asText(resultLine(theme, writeSummary(context.args), "success"));
-    },
-  };
+function asArguments(value: unknown): ToolArguments {
+  return value && typeof value === "object" ? (value as ToolArguments) : {}
 }
 
-function compactEditRenderer(base: ReturnType<typeof createEditToolDefinition>) {
-  return {
-    ...base,
-    renderShell: "self" as const,
-    renderCall(args: any, theme: any, context: RenderContext) {
-      return asText(header(theme, "Edit", displayPath(args?.path ?? args?.file_path, context.cwd), context));
-    },
-    renderResult(result: AgentToolResult<EditToolDetails | undefined>, options: any, theme: any, context: RenderContext) {
-      if (context.isError) return asText(resultLine(theme, oneLine(textOutput(result) || "Edit failed", 160), "error"));
-      const summary = editSummary(context.args, result);
-      if (options.expanded && result.details?.diff) {
-        return expandedBlock(theme, summary, renderDiff(result.details.diff));
-      }
-      return asText(resultLine(theme, summary, "success"));
-    },
-  };
+function isToolName(value: unknown): value is ToolName {
+  return typeof value === "string" && SUPPORTED_TOOLS.has(value as ToolName)
 }
 
-function compactBashRenderer(base: ReturnType<typeof createBashToolDefinition>) {
-  return {
-    ...base,
-    renderShell: "self" as const,
-    renderCall(args: any, theme: any, context: RenderContext) {
-      if (context.executionStarted && context.state.startedAt === undefined) {
-        context.state.startedAt = Date.now();
-        context.state.endedAt = undefined;
-      }
-      const command = typeof args?.command === "string" ? args.command : "…";
-      return {
-        render(width: number) {
-          return [truncateToWidth(header(theme, "Bash", oneLine(command, Math.max(24, width - 12)), context), width, "…")];
-        },
-        invalidate() {},
-      };
-    },
-    renderResult(result: AgentToolResult<BashToolDetails | undefined>, options: any, theme: any, context: RenderContext) {
-      if (context.state.startedAt !== undefined && options.isPartial && !context.state.interval) {
-        context.state.interval = setInterval(() => context.invalidate(), 1000);
-      }
-      if (!options.isPartial || context.isError) {
-        context.state.endedAt ??= Date.now();
-        if (context.state.interval) {
-          clearInterval(context.state.interval);
-          context.state.interval = undefined;
-        }
-      }
-
-      const summary = bashSummary(result, context);
-      if (options.expanded) {
-        const output = textOutput(result).trim();
-        const body = output && output !== "(no output)" ? theme.fg("toolOutput", output) : "";
-        return expandedBlock(theme, summary, body);
-      }
-      return asText(resultLine(theme, summary, context.isError ? "error" : options.isPartial ? "muted" : "success"));
-    },
-  };
-}
-
-function compactLsRenderer(base: ReturnType<typeof createLsToolDefinition>) {
-  return {
-    ...base,
-    renderShell: "self" as const,
-    renderCall(args: any, theme: any, context: RenderContext) {
-      return asText(header(theme, "List", displayPath(args?.path || ".", context.cwd), context));
-    },
-    renderResult(result: AgentToolResult<LsToolDetails | undefined>, options: any, theme: any, context: RenderContext) {
-      if (context.isError) return asText(resultLine(theme, oneLine(textOutput(result) || "List failed", 140), "error"));
-      const output = textOutput(result).trim();
-      const count = output === "(empty directory)" ? 0 : lineCount(output.replace(/\n\n\[[^\]]+\]$/s, ""));
-      const suffix = result.details?.entryLimitReached ? "+" : "";
-      const summary = count === 0 ? "Empty directory" : `Listed ${count}${suffix} entries`;
-      if (options.expanded) return expandedBlock(theme, summary, output ? theme.fg("toolOutput", output) : "");
-      return asText(resultLine(theme, summary, "success"));
-    },
-  };
-}
-
-function compactFindRenderer(base: ReturnType<typeof createFindToolDefinition>) {
-  return {
-    ...base,
-    renderShell: "self" as const,
-    renderCall(args: any, theme: any, context: RenderContext) {
-      const pattern = typeof args?.pattern === "string" ? args.pattern : "…";
-      const where = displayPath(args?.path || ".", context.cwd);
-      return asText(header(theme, "Find", `${pattern} in ${where}`, context));
-    },
-    renderResult(result: AgentToolResult<FindToolDetails | undefined>, options: any, theme: any, context: RenderContext) {
-      if (context.isError) return asText(resultLine(theme, oneLine(textOutput(result) || "Find failed", 140), "error"));
-      const output = textOutput(result).trim();
-      const noResults = /^No files found/m.test(output);
-      const count = noResults ? 0 : lineCount(output.replace(/\n\n\[[^\]]+\]$/s, ""));
-      const suffix = result.details?.resultLimitReached ? "+" : "";
-      const summary = count === 0 ? "No files found" : `Found ${count}${suffix} files`;
-      if (options.expanded) return expandedBlock(theme, summary, output ? theme.fg("toolOutput", output) : "");
-      return asText(resultLine(theme, summary, "success"));
-    },
-  };
-}
-
-function compactGrepRenderer(base: ReturnType<typeof createGrepToolDefinition>) {
-  return {
-    ...base,
-    renderShell: "self" as const,
-    renderCall(args: any, theme: any, context: RenderContext) {
-      const pattern = typeof args?.pattern === "string" ? `/${args.pattern}/` : "/…/";
-      const where = displayPath(args?.path || ".", context.cwd);
-      return asText(header(theme, "Grep", `${pattern} in ${where}`, context));
-    },
-    renderResult(result: AgentToolResult<GrepToolDetails | undefined>, options: any, theme: any, context: RenderContext) {
-      if (context.isError) return asText(resultLine(theme, oneLine(textOutput(result) || "Grep failed", 140), "error"));
-      const output = textOutput(result).trim();
-      const noResults = /^No matches found/m.test(output);
-      const lines = output.replace(/\n\n\[[^\]]+\]$/s, "").split("\n").filter(Boolean);
-      const matches = noResults ? 0 : lines.filter((line) => /^[^\n:]+:\d+:/.test(line)).length || lines.length;
-      const suffix = result.details?.matchLimitReached ? "+" : "";
-      const summary = matches === 0 ? "No matches" : `Found ${matches}${suffix} matches`;
-      if (options.expanded) return expandedBlock(theme, summary, output ? theme.fg("toolOutput", output) : "");
-      return asText(resultLine(theme, summary, "success"));
-    },
-  };
-}
-
-function registerCompact(pi: ExtensionAPI, cwd: string): void {
-  pi.registerTool(compactReadRenderer(createReadToolDefinition(cwd)) as any);
-  pi.registerTool(compactWriteRenderer(createWriteToolDefinition(cwd)) as any);
-  pi.registerTool(compactEditRenderer(createEditToolDefinition(cwd)) as any);
-  pi.registerTool(compactBashRenderer(createBashToolDefinition(cwd)) as any);
-  pi.registerTool(compactLsRenderer(createLsToolDefinition(cwd)) as any);
-  pi.registerTool(compactFindRenderer(createFindToolDefinition(cwd)) as any);
-  pi.registerTool(compactGrepRenderer(createGrepToolDefinition(cwd)) as any);
-}
-
-export default function compactToolsExtension(pi: ExtensionAPI) {
-  pi.on("session_start", (_event, ctx) => {
-    registerCompact(pi, ctx.cwd);
-  });
+function hidden(): Container {
+  return new Container()
 }

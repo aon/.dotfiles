@@ -9,11 +9,14 @@
 !agent/
 !agent/extensions/
 !agent/npm/
+!agent/tests/
 
 # Re-include only the specific files we track
 !agent/settings.json
+!agent/compact-tool-view.json
 !agent/extensions/*.ts
 !agent/npm/package.json
+!agent/tests/*.test.ts
 
 # Keep this file tracked
 !.gitignore
