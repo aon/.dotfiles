@@ -45,8 +45,22 @@ function link(label: string, url: string): string {
 
 const ICONS_ENABLED = process.env.PI_RICH_FOOTER_ICONS !== "0";
 const icons = ICONS_ENABLED
-	? { model: "󰚩", effort: "󰧑", context: "󰾆", branch: "󰘬", pr: "", none: "○" }
-	: { model: "model", effort: "effort", context: "ctx", branch: "branch", pr: "PR", none: "-" };
+	? {
+			model: "󰚩",
+			effort: "󰧑",
+			context: { low: "󰾆", medium: "󰾅", high: "󰓅" },
+			branch: "󰘬",
+			pr: "",
+			none: "○",
+		}
+	: {
+			model: "model",
+			effort: "effort",
+			context: { low: "ctx", medium: "ctx", high: "ctx" },
+			branch: "branch",
+			pr: "PR",
+			none: "-",
+		};
 
 export default function (pi: ExtensionAPI) {
 	let prInfo: PrInfo | null = null;
@@ -107,6 +121,7 @@ export default function (pi: ExtensionAPI) {
 
 					const effortColor = effort === "off" || effort === "minimal" ? "dim" : (`thinking${effort[0].toUpperCase()}${effort.slice(1)}` as any);
 					const contextColor = typeof usage?.percent === "number" && usage.percent >= 85 ? "error" : typeof usage?.percent === "number" && usage.percent >= 60 ? "warning" : "success";
+					const contextIcon = typeof usage?.percent === "number" && usage.percent >= 85 ? icons.context.high : typeof usage?.percent === "number" && usage.percent >= 60 ? icons.context.medium : icons.context.low;
 					const segment = (icon: string, value: string, color: string = "accent") => `${theme.fg(color as any, icon)} ${theme.fg("muted", value)}`;
 					const sep = theme.fg("dim", " · ");
 
@@ -115,7 +130,7 @@ export default function (pi: ExtensionAPI) {
 					const fullParts = [
 						segment(icons.model, model, "accent"),
 						segment(icons.effort, effort, effortColor),
-						segment(icons.context, context, contextColor),
+						segment(contextIcon, context, contextColor),
 						branchSegment,
 						segment(prInfo?.state === "found" ? icons.pr : icons.none, prText, prInfo?.state === "found" ? "success" : "dim"),
 					];
