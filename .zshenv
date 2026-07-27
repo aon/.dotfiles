@@ -20,6 +20,9 @@ bunx() { _load_nvm; bunx "$@"; }
 # lts/krypton -> v24.18.0) to the resolved version dir.
 _d="$(cat "$NVM_DIR/alias/default" 2>/dev/null)"
 while [ -f "$NVM_DIR/alias/$_d" ]; do _d="$(cat "$NVM_DIR/alias/$_d")"; done
+# default may also be a version *prefix* ("v22") rather than an alias — resolve it
+# to the highest installed matching version, the way nvm itself does.
+[ -d "$NVM_DIR/versions/node/$_d/bin" ] || _d="$(ls -1 "$NVM_DIR/versions/node" 2>/dev/null | grep -E "^${_d}(\.|$)" | sort -V | tail -1)"
 [ -d "$NVM_DIR/versions/node/$_d/bin" ] && export PATH="$NVM_DIR/versions/node/$_d/bin:$PATH"
 unset _d
 
