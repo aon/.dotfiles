@@ -179,16 +179,6 @@ fi
 # macos specific
 ulimit -n 10240
 
-# Auto-switch node version on directory change (and on shell startup)
-autoload -U add-zsh-hook
-_auto_load_nvmrc() {
-  if [[ -f .nvmrc ]] && type nvm &>/dev/null; then
-    nvm use --silent
-  fi
-}
-add-zsh-hook chpwd _auto_load_nvmrc
-_auto_load_nvmrc  # Also run on shell startup for when terminal opens directly in a folder with .nvmrc
-
 # rust
 source_if_exists ${HOME}/.cargo/env
 
@@ -220,3 +210,11 @@ fi
 
 ## Machine-local overrides
 source_if_exists ${DOTFILES}/.zshrc.local
+
+# mise — per-directory tool versions (node, pnpm). Hooks into cd and re-evaluates
+# on each prompt, so `which node` shows a real versioned path. Non-interactive
+# shells don't run this; they get the shims exported from .zshenv instead.
+eval "$(mise activate zsh)"
+
+# bun completions
+[ -s "/Users/agustin/.bun/_bun" ] && source "/Users/agustin/.bun/_bun"
