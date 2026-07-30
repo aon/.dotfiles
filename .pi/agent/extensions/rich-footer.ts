@@ -51,6 +51,7 @@ const icons = ICONS_ENABLED
 			context: { low: "󰾆", medium: "󰾅", high: "󰓅" },
 			branch: "󰘬",
 			pr: "",
+			mcp: "",
 			none: "○",
 		}
 	: {
@@ -59,6 +60,7 @@ const icons = ICONS_ENABLED
 			context: { low: "ctx", medium: "ctx", high: "ctx" },
 			branch: "branch",
 			pr: "PR",
+			mcp: "MCP",
 			none: "-",
 		};
 
@@ -117,7 +119,11 @@ export default function (pi: ExtensionAPI) {
 					const branchText = branch || "no-git";
 					const prLabel = prInfo?.state === "found" ? `#${prInfo.number}` : prInfo?.state === "loading" ? "…" : "no PR";
 					const prText = prInfo?.state === "found" ? link(prLabel, prInfo.url) : prLabel;
-					const extensionStatuses = [...footerData.getExtensionStatuses().values()].filter((status) => status.length > 0);
+					const extensionStatuses = [...footerData.getExtensionStatuses().entries()]
+						.filter(([key, status]) => key !== "mcp" && status.length > 0)
+						.map(([, status]) => status);
+					const rawMcpStatus = footerData.getExtensionStatuses().get("mcp");
+					const mcpStatus = rawMcpStatus ? verboseMcpStatus(rawMcpStatus) : undefined;
 
 					const effortColor = effort === "off" || effort === "minimal" ? "dim" : (`thinking${effort[0].toUpperCase()}${effort.slice(1)}` as any);
 					const contextColor = typeof usage?.percent === "number" && usage.percent >= 85 ? "error" : typeof usage?.percent === "number" && usage.percent >= 60 ? "warning" : "success";
@@ -134,23 +140,45 @@ export default function (pi: ExtensionAPI) {
 						branchSegment,
 						segment(prInfo?.state === "found" ? icons.pr : icons.none, prText, prInfo?.state === "found" ? "success" : "dim"),
 					];
-					const compactParts = fullParts;
-					const tinyParts = [theme.fg("muted", model), theme.fg(contextColor as any, context), branchWithStatuses, prInfo?.state === "found" ? theme.fg("success", prText) : theme.fg("dim", icons.none)];
+					const tinyParts = [
+						theme.fg("muted", model),
+						theme.fg(contextColor as any, context),
+						branchWithStatuses,
+						prInfo?.state === "found" ? theme.fg("success", prText) : theme.fg("dim", icons.none),
+					];
+					const mcpSegment = mcpStatus ? segment(icons.mcp, mcpStatus, "warning") : undefined;
+					const fullLeft = fullParts.join(sep);
+					const tinyLeft = tinyParts.join(sep);
+					const preferredLeft = visibleWidth(fullLeft) + statusWidth(mcpSegment) <= width ? fullLeft : tinyLeft;
 
-					const fullLine = fullParts.join(sep);
-					const compactLine = compactParts.join(sep);
-					const tinyLine = tinyParts.join(sep);
-
-					const chosen =
-						visibleWidth(fullLine) <= width
-							? fullLine
-							: visibleWidth(compactLine) <= width
-								? compactLine
-								: tinyLine;
-
-					return [truncateToWidth(chosen, width, "…")];
+					return [alignStatusRight(preferredLeft, mcpSegment, width)];
 				},
 			};
 		});
 	});
+}
+
+function verboseMcpStatus(status: string): string {
+	const details = status.match(/MCP:\s*([^\x1b]+)/)?.[1]?.trim();
+	return details ? `MCP: ${details}` : "MCP";
+}
+
+function statusWidth(status: string | undefined): number {
+	return status ? visibleWidth(status) + 2 : 0;
+}
+
+function alignStatusRight(left: string, right: string | undefined, width: number): string {
+	if (!right) {
+		return truncateToWidth(left, width, "…");
+	}
+
+	const rightWidth = visibleWidth(right);
+	if (rightWidth >= width) {
+		return truncateToWidth(right, width, "…");
+	}
+
+	const leftWidth = Math.max(0, width - rightWidth - 2);
+	const truncatedLeft = truncateToWidth(left, leftWidth, "…");
+	const padding = " ".repeat(width - visibleWidth(truncatedLeft) - rightWidth);
+	return `${truncatedLeft}${padding}${right}`;
 }
