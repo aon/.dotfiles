@@ -12,6 +12,8 @@
 skills/*
 !skills/delegate-to-worktree/
 !skills/delegate-to-worktree/**
+!skills/pr/
+!skills/pr/**
 # Add more as needed, e.g.:
 # !CLAUDE.md
 # !commands/
