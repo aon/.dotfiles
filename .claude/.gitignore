@@ -10,6 +10,8 @@
 # which the skill installer owns via .skill-lock.json.
 !skills/
 skills/*
+!skills/bro/
+!skills/bro/**
 !skills/delegate-to-worktree/
 !skills/delegate-to-worktree/**
 !skills/pr/
