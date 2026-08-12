@@ -5,7 +5,7 @@
     "@firstpick/pi-themes-bundle": "^0.1.4",
     "@juicesharp/rpiv-ask-user-question": "^2.2.0",
     "@juicesharp/rpiv-todo": "^1.20.0",
-    "@plannotator/pi-extension": "^0.25.0",
+    "@plannotator/pi-extension": "^0.25.1",
     "pi-mcp-adapter": "^2.15.0",
     "pi-subagents": "^0.37.2",
     "pi-web-access": "^0.15.0"
