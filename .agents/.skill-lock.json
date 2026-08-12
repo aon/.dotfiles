@@ -104,9 +104,9 @@
       "sourceType": "github",
       "sourceUrl": "https://github.com/stablyai/orca.git",
       "skillPath": "skills/orca-cli/SKILL.md",
-      "skillFolderHash": "97f6596bb43a56c6e81246f077c35144c9025343",
+      "skillFolderHash": "a5a90c9731fbee834eca6d655b39eaa795dd2323",
       "installedAt": "2026-06-23T16:53:59.667Z",
-      "updatedAt": "2026-07-30T00:10:41.464Z"
+      "updatedAt": "2026-08-10T13:28:16.032Z"
     },
     "impeccable": {
       "source": "pbakaus/impeccable",
@@ -185,6 +185,168 @@
       "skillFolderHash": "f2c0125db05db4d8f905a9423af308c476e2e4d5",
       "installedAt": "2026-07-30T00:18:05.480Z",
       "updatedAt": "2026-07-30T00:18:05.480Z"
+    },
+    "planetscale-safe-orchestrator": {
+      "source": "planetscale/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/planetscale/skills.git",
+      "skillPath": "00-safe-orchestrator/SKILL.md",
+      "skillFolderHash": "d48f96b4072093aded8b9d6b7f4fc48ddd8f01de",
+      "installedAt": "2026-07-12T23:12:19.616Z",
+      "updatedAt": "2026-07-12T23:12:19.616Z"
+    },
+    "planetscale-readonly-inventory": {
+      "source": "planetscale/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/planetscale/skills.git",
+      "skillPath": "01-readonly-inventory/SKILL.md",
+      "skillFolderHash": "8f1721cea7f6ab6acb2fea704a7d5529339c48ce",
+      "installedAt": "2026-07-12T23:12:19.617Z",
+      "updatedAt": "2026-07-12T23:12:19.617Z"
+    },
+    "planetscale-vitess-safety-review": {
+      "source": "planetscale/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/planetscale/skills.git",
+      "skillPath": "02-vitess-safety-review/SKILL.md",
+      "skillFolderHash": "f25475a4e8a9e19f07ea76e4d15159fc8a98d5dc",
+      "installedAt": "2026-07-12T23:12:19.617Z",
+      "updatedAt": "2026-07-12T23:12:19.617Z"
+    },
+    "planetscale-postgres-safety-review": {
+      "source": "planetscale/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/planetscale/skills.git",
+      "skillPath": "03-postgres-safety-review/SKILL.md",
+      "skillFolderHash": "bcf4679eccf19273464e6d7b0f20b5a136001249",
+      "installedAt": "2026-07-12T23:12:19.618Z",
+      "updatedAt": "2026-07-12T23:12:19.618Z"
+    },
+    "planetscale-query-insights-and-tags": {
+      "source": "planetscale/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/planetscale/skills.git",
+      "skillPath": "04-query-insights-and-tags/SKILL.md",
+      "skillFolderHash": "11b72c5f50b99ac1e5e5e5ba3b34b0eadd747452",
+      "installedAt": "2026-07-12T23:12:19.618Z",
+      "updatedAt": "2026-07-12T23:12:19.618Z"
+    },
+    "planetscale-traffic-control-recommendations": {
+      "source": "planetscale/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/planetscale/skills.git",
+      "skillPath": "05-traffic-control-recommendations/SKILL.md",
+      "skillFolderHash": "b8f9319a9d13a0d643f4f7791e66c518a318ece9",
+      "installedAt": "2026-07-12T23:12:19.618Z",
+      "updatedAt": "2026-07-12T23:12:19.618Z"
+    },
+    "planetscale-webhook-automation-recommendations": {
+      "source": "planetscale/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/planetscale/skills.git",
+      "skillPath": "06-webhook-automation-recommendations/SKILL.md",
+      "skillFolderHash": "5fd4120b5adc128850357efc6fb9ad5e570f7662",
+      "installedAt": "2026-07-12T23:12:19.619Z",
+      "updatedAt": "2026-07-12T23:12:19.619Z"
+    },
+    "planetscale-schema-recommendations-agent-loop": {
+      "source": "planetscale/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/planetscale/skills.git",
+      "skillPath": "07-schema-recommendations-agent-loop/SKILL.md",
+      "skillFolderHash": "7e96208791f659cd0bd8c587869057d313299082",
+      "installedAt": "2026-07-12T23:12:19.619Z",
+      "updatedAt": "2026-07-12T23:12:19.619Z"
+    },
+    "planetscale-codebase-sqlcommenter-instrumentation": {
+      "source": "planetscale/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/planetscale/skills.git",
+      "skillPath": "08-codebase-sqlcommenter-instrumentation/SKILL.md",
+      "skillFolderHash": "0046a1ffd2733c153a30198da205b2dfd490ee58",
+      "installedAt": "2026-07-12T23:12:19.619Z",
+      "updatedAt": "2026-07-12T23:12:19.619Z"
+    },
+    "planetscale-mcp-agent-operating-model": {
+      "source": "planetscale/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/planetscale/skills.git",
+      "skillPath": "09-mcp-agent-operating-model/SKILL.md",
+      "skillFolderHash": "a49bab0e2b76e7ff915f6c3ecb516d8db60eaca0",
+      "installedAt": "2026-07-12T23:12:19.620Z",
+      "updatedAt": "2026-07-12T23:12:19.620Z"
+    },
+    "planetscale-customer-report-template": {
+      "source": "planetscale/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/planetscale/skills.git",
+      "skillPath": "10-customer-report-template/SKILL.md",
+      "skillFolderHash": "93a1ba19dac6f5a46c20fdb75bc39db90152ed73",
+      "installedAt": "2026-07-12T23:12:19.620Z",
+      "updatedAt": "2026-07-12T23:12:19.620Z"
+    },
+    "planetscale-change-gates-and-approval-contract": {
+      "source": "planetscale/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/planetscale/skills.git",
+      "skillPath": "11-change-gates-and-approval-contract/SKILL.md",
+      "skillFolderHash": "77f7553530bb6843c1d750f69511ac9e2eadbb0d",
+      "installedAt": "2026-07-12T23:12:19.620Z",
+      "updatedAt": "2026-07-12T23:12:19.620Z"
+    },
+    "planetscale-best-practices-matrix": {
+      "source": "planetscale/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/planetscale/skills.git",
+      "skillPath": "12-best-practices-matrix/SKILL.md",
+      "skillFolderHash": "8100e4b8f2ebd129a03a91b0fb41fe029749417a",
+      "installedAt": "2026-07-12T23:12:19.621Z",
+      "updatedAt": "2026-07-12T23:12:19.621Z"
+    },
+    "planetscale-autonomous-execution-mode": {
+      "source": "planetscale/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/planetscale/skills.git",
+      "skillPath": "13-autonomous-execution-mode/SKILL.md",
+      "skillFolderHash": "363770a114bba21380ce422ef1ae5e0bbf7bd2fe",
+      "installedAt": "2026-07-12T23:12:19.621Z",
+      "updatedAt": "2026-07-12T23:12:19.621Z"
+    },
+    "planetscale-pscale-cli-automation": {
+      "source": "planetscale/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/planetscale/skills.git",
+      "skillPath": "14-pscale-cli-automation/SKILL.md",
+      "skillFolderHash": "316c72cf616b6aa1331a39ba5cbaeedfc988e493",
+      "installedAt": "2026-07-12T23:12:19.622Z",
+      "updatedAt": "2026-07-12T23:12:19.622Z"
+    },
+    "find-animation-opportunities": {
+      "source": "emilkowalski/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/emilkowalski/skills.git",
+      "skillPath": "skills/find-animation-opportunities/SKILL.md",
+      "skillFolderHash": "502f891c05c9cade7e7bd815e3f228fdd20b61b6",
+      "installedAt": "2026-07-21T19:36:48.852Z",
+      "updatedAt": "2026-07-21T19:36:48.852Z"
+    },
+    "improve-animations": {
+      "source": "emilkowalski/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/emilkowalski/skills.git",
+      "skillPath": "skills/improve-animations/SKILL.md",
+      "skillFolderHash": "2ff93ddb9833df45f5e83080de838bb668530820",
+      "installedAt": "2026-07-21T19:41:03.540Z",
+      "updatedAt": "2026-07-21T19:41:03.540Z"
+    },
+    "gh-stack": {
+      "source": "github/gh-stack",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/github/gh-stack.git",
+      "skillPath": "skills/gh-stack/SKILL.md",
+      "skillFolderHash": "c29ba25c9c07534c27f1a3253bd0ca3846c4f8c7",
+      "installedAt": "2026-08-06T16:09:27.016Z",
+      "updatedAt": "2026-08-06T16:09:27.016Z"
     }
   },
   "dismissed": {
