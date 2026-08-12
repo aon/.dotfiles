@@ -6,6 +6,12 @@
 !settings.json
 !settings.local.json
 !keybindings.json
+# Hand-written skills only. The rest of skills/ is symlinks into ~/.agents/skills,
+# which the skill installer owns via .skill-lock.json.
+!skills/
+skills/*
+!skills/delegate-to-worktree/
+!skills/delegate-to-worktree/**
 # Add more as needed, e.g.:
 # !CLAUDE.md
 # !commands/
