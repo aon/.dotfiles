@@ -3,7 +3,7 @@
 # projects, sessions, logs) stays machine-local and is never tracked.
 *
 !.gitignore
-!settings.json
+# settings.json stays machine-local: it drifts per machine (hooks, plugins, theme).
 !settings.local.json
 !keybindings.json
 # Hand-written skills only. The rest of skills/ is symlinks into ~/.agents/skills,
