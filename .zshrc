@@ -58,7 +58,12 @@ bindkey '^[[C'  forward-char                                    # Right key
 bindkey '^[[D'  backward-char                                   # Left key
 bindkey '^[[5~' history-beginning-search-backward               # Page up key
 bindkey '^[[6~' history-beginning-search-forward                # Page down key
-bindkey '^L'    clear-screen					                          # Clear screen
+clear-screen-and-scrollback() {
+  printf '\e[2J\e[3J\e[H'
+  zle reset-prompt
+}
+zle -N clear-screen-and-scrollback
+bindkey '^L'    clear-screen-and-scrollback                     # Clear screen + scrollback
 bindkey '^[[1;3C' forward-word  					                      # Move one word forward
 bindkey '^[[1;3D' backward-word   					                    # Move one word backwards
 bindkey '^[[3;3~' kill-word                                     # Delete next word
@@ -187,6 +192,9 @@ if [[ "$CLAUDECODE" != "1" ]] && type zoxide &>/dev/null; then
   eval "$(zoxide init --cmd cd zsh)"
 fi
 
+# inngest
+export INNGEST_API_KEY="$(get_private_config INNGEST_API_KEY)"
+
 ## Work related
 claude-msl() {
   #CLAUDE_CONFIG_DIR=${HOME}/Developer/msl/.claude \
@@ -226,3 +234,8 @@ case ":$PATH:" in
   *) export PATH="$PNPM_HOME/bin:$PATH" ;;
 esac
 # pnpm end
+
+# herdr-automatic-rename: instant tab rename on command start
+for _f in ${HOME}/.config/herdr/plugins/github/herdr-automatic-rename-*/shell/hook.zsh(N); do
+  source $_f; break
+done

@@ -1,88 +1,118 @@
 ---
 name: pr
 description: >-
-  Abrir el pull request de la rama actual y quedarse hasta que el CI esté en verde. Escribe el
-  cuerpo en español siguiendo el template del repo, breve y sin lenguaje de IA, después espera los
-  checks y arregla lo que rompa. Usar cuando el usuario dice "creá el PR", "abrí el PR", "abrime
-  un PR", "subilo", "open the PR", o cuando un agente delegado llega al cierre de su tarea. El
-  automerge NO es el default: solo se activa si lo piden explícitamente.
+  Open the pull request for the current branch and stay until CI is green. Writes the body in the
+  repo's own language following its template, short and free of AI tells, then waits on the checks
+  and fixes whatever breaks. Use when the user says "creá el PR", "abrí el PR", "abrime un PR",
+  "subilo", "open the PR", or when a delegated agent reaches the end of its task. Automerge is NOT
+  the default: it is only enabled when explicitly asked for.
 ---
 
 # PR
 
-Abrís el PR, lo dejás en verde, y recién ahí terminás.
+You open the PR, you get it green, and only then are you done.
 
-## 1. Antes de empezar
+## 1. Before you start
 
-- Todo commiteado y pusheado (`git status --porcelain` vacío, rama con upstream).
-- No estás en `main`.
-- Si el usuario pidió automerge, anotalo: cambia el paso 5.
+- Everything committed and pushed (`git status --porcelain` empty, branch tracking an upstream).
+- You are not on `main`.
+- If the user asked for automerge, note it: it changes step 5.
 
-## 2. Escribir el cuerpo
+## 2. Writing the body
 
-Leé `.github/pull_request_template.md` del repo y seguí sus secciones. No lo copies acá: si el
-template cambia, esta skill no se entera.
+Read the repo's `.github/pull_request_template.md` and follow its sections. Don't copy it here: if
+the template changes, this skill won't hear about it.
 
-**Breve. En serio breve.** El objetivo es que se lea en 30 segundos:
+**Write in the language the repo already uses.** Check before writing — `gh pr list --state merged
+--limit 10 --json title,body` and `git log -20 --format=%s`. Match what you find, title and body
+alike: a Spanish repo gets Spanish, an English one gets English. Fall back to English when there is
+no signal or the history is mixed. An explicit request from the user beats whatever the repo does.
 
-- *Problema*: 1 a 3 líneas.
-- *Solución*: 2 a 5 líneas o bullets.
-- *Testing*: los comandos que corriste, con su resultado.
-- Todo junto, menos de 15 líneas.
+**Hard cap: two sentences and 50 words per section.** No exceptions, no sections that "need a bit
+more". If it doesn't fit, it's because you are explaining the diff instead of the why.
 
-**La regla que decide qué entra:** cada línea trae un dato que el reviewer **no** puede sacar del
-diff. Números, fechas, ids, el error exacto, la alternativa que descartaste y por qué. Si una línea
-describe lo que el diff ya muestra, borrala.
+Both limits are there because the sentence count alone games easily: two 55-word sentences chained
+with colons and em dashes keep to the letter and break the rule.
 
-**Prohibido** — esto es lo que hace que un PR huela a IA:
+**What earns a slot is a budget, not a filter.** Every sentence has to carry something the reviewer
+**cannot** get from the diff — numbers, ids, the exact error, the alternative you discarded and why
+— but qualifying doesn't buy a place. You have two slots: pick the two that change the reviewer's
+read the most and drop the rest, however true, relevant, and hard-won. What's left over lives in the
+PR thread if someone asks, not in the body.
 
-| No | Por qué |
+**One paragraph = one line of the file.** Don't wrap at 100 characters: GitHub renders every newline
+as a line break and the paragraph comes out laddered. Newlines only between paragraphs and sections.
+
+**If the feature adds or changes UI, a screenshot goes inside *Solution*.** Take it from the dev
+server with real data, host it as a release asset (`gh release create pr-<n>-screenshots <file>
+--prerelease --notes "Safe to delete."`) and embed it with `![alt](<asset-url>)`. Never commit the
+image to the repo. The screenshot counts against neither the sentence nor the word cap.
+
+**Banned** — this is what makes a PR smell like AI:
+
+| No | Why |
 |---|---|
-| "Este PR introduce / agrega / implementa…" | Arranque de plantilla. Empezá por el hecho. |
-| Enumerar los archivos tocados | Está en el diff. |
-| Parafrasear el diff en prosa | Idem. |
-| "Además", "Asimismo", "Cabe destacar", "Es importante notar" | Relleno conector. |
-| Emojis de sección, negritas decorativas | Ruido. |
-| "de forma robusta / elegante / limpia" | Autoelogio sin dato. |
-| Un párrafo final que resume lo que acabás de decir | Ya lo dijiste. |
+| "This PR introduces / adds / implements…" | Template opener. Start with the fact. |
+| Listing the files you touched | It's in the diff. |
+| Paraphrasing the diff in prose | Same. |
+| "Additionally", "Furthermore", "It's worth noting", "Importantly" | Connector filler. |
+| Section emojis, decorative bold | Noise. |
+| "robustly / elegantly / cleanly" | Self-praise with no data. |
+| A closing paragraph summarising what you just said | You already said it. |
+| The whole mechanism when the effect is enough | Technical filler: true, relevant, and surplus. The hardest one to spot, because every sentence passes the filter and the set is still too much. |
 
-Escribí como si se lo contaras a un colega que conoce el código: directo, en primera persona
-cuando corresponde, sin ceremonia.
+Write it as if you were telling a colleague who knows the code: direct, first person where it fits,
+no ceremony.
 
-**Ejemplo del tono** (de este repo, PR de un fix de config):
+**Example of the tone** (a config fix, from a repo that writes its PRs in English):
 
 ```markdown
-**Problema:**
+**Problem:**
 
-Los tests de `@afippi/core` fallaban con `Cannot find package '@afippi/core/utils/...'` sobre
-archivos que sí están en el código fuente. `pnpm check` pasaba y CI también.
+`@afippi/core` tests failed with `Cannot find package '@afippi/core/utils/...'` on files that are right there in the source. `pnpm check` passed and so did CI.
 
-**Solución:**
+**Solution:**
 
-Los tests de core lo importan por nombre de paquete y el `exports` map resuelve a `dist/`. La task
-`test` declaraba solo `^build`, que compila las dependencias y nunca a core, así que corría contra
-un `dist` viejo. Agregué `packages/core/turbo.json` con `dependsOn: ["^build", "build"]`.
+The `test` task declared only `^build`, so core never compiled and the tests ran against a stale `dist`. Added `packages/core/turbo.json` with `dependsOn: ["^build", "build"]`.
 
 ---
 
 *Testing:*
 
-Borré `packages/core/dist` y corrí `turbo test --filter=@afippi/core`: antes 24 archivos en rojo,
-ahora buildea primero y pasan los 58. `pnpm test` completo en 9/9.
+Deleted `packages/core/dist` and ran `turbo test --filter=@afippi/core`: 24 files red before, all 58 passing now.
 ```
 
-## 3. Crear el PR
+That's 24, 24 and 15 words. This is the real size of a good body: the 50-word cap is a ceiling with
+room to spare, not a target to reach.
+
+**A real counterexample** — the *Problem* of a date picker fix, 68 words in two sentences:
+
+> While you pick a range in the calendar, the screen behind it reloads and the popover blinks off for half a second on every click: `/dashboard/cuits/` and `/dashboard/cuits/$publicId/` declare `from`/`to` in `loaderDeps`, so rewriting the search params produces a new match in `pending` and React hides the suspended subtree with `display: none` — and react-dom's `hideOrUnhideAllChildren` walks into portals too, so it takes Radix's `PopoverContent` down with it…
+
+Every fact is true and none of it comes from the diff, so they pass the filter one by one — and the
+set is still surplus. This was enough: "picking a date rewrites the search params and the route
+suspends, which kills the popover mid-pick". If what you have is a nice investigation, the body of
+the PR is not where it goes.
+
+## 3. Creating the PR
+
+Before creating it, count the words per section. If any goes over 50, cut — don't negotiate with the
+cap:
 
 ```bash
-gh pr create --title "<conventional commit>" --body-file <archivo>
+awk '/^\*\*.*:\*\*|^\*.*:\*/{if(h)printf "%-14s %s words\n",h,n; h=$0; n=0; next} !/^---$/{n+=NF} END{printf "%-14s %s words\n",h,n}' <file>
 ```
 
-Título con prefijo convencional, en español, igual que el commit principal.
+```bash
+gh pr create --title "<conventional commit>" --body-file <file>
+```
 
-## 4. Esperar el CI
+Conventional prefix on the title, in the same language as the body, matching the main commit.
 
-No termines el turno con el PR sin resolver. Armá un **Monitor** (`persistent: true`, description
-`checks del PR <n>`) que emita cada check apenas cierra y corte cuando no queda ninguno pendiente:
+## 4. Waiting on CI
+
+Don't end the turn with the PR unresolved. Set up a **Monitor** (`persistent: true`, description
+`checks for PR <n>`) that emits each check as it closes and stops when none are pending:
 
 ```bash
 prev=""
@@ -97,33 +127,34 @@ while true; do
 done
 ```
 
-El `|| true` no es cosmético: `gh pr checks` sale con código distinto de cero cuando hay checks
-pendientes o rojos, así que sin eso perdés la salida buena.
+The `|| true` is not cosmetic: `gh pr checks` exits non-zero while checks are pending or red, so
+without it you lose the output you wanted.
 
-Cada check llega como notificación con su bucket (`pass`, `fail`, `skipping`, `cancel`) — arrancá a
-arreglar el primero que se pone rojo sin esperar a que terminen los demás. Seguí trabajando mientras
-tanto; las notificaciones te encuentran.
+Each check arrives as a notification with its bucket (`pass`, `fail`, `skipping`, `cancel`) — start
+fixing the first one that goes red without waiting for the rest. Keep working meanwhile; the
+notifications will find you.
 
-Nunca esperes el CI en primer plano: el CI de este repo tarda más que el tope de una llamada de
-shell y te la come el timeout.
+Never wait on CI in the foreground: CI takes longer than the cap on a shell call and the timeout
+eats it.
 
-## 5. Si el CI falla
+## 5. If CI fails
 
-1. Leé el log del check que falló (`gh run view <run-id> --log-failed`).
-2. Arreglalo, commiteá, pusheá, volvé al paso 4.
-3. **Máximo 2 intentos.** Si al tercero sigue rojo: `gh pr ready --undo`, dejá la salida exacta del
-   check que falla en un comentario del PR, y frená. No sigas intentando y no lo escondas.
+1. Read the log of the check that failed (`gh run view <run-id> --log-failed`).
+2. Fix it, commit, push, go back to step 4.
+3. **Two attempts maximum.** If it's still red on the third: `gh pr ready --undo`, leave the exact
+   output of the failing check in a PR comment, and stop. Don't keep trying and don't hide it.
 
-Si el usuario pidió **automerge** y el PR quedó en verde:
+If the user asked for **automerge** and the PR is green:
 
 ```bash
 gh pr merge <n> --auto --merge
 ```
 
-Este repo solo permite merge commits — `--squash` y `--rebase` están deshabilitados. Sin pedido
-explícito, no lo actives.
+Check which merge methods the repo allows before picking the flag (`gh repo view --json
+mergeCommitAllowed,squashMergeAllowed,rebaseMergeAllowed`); several of these repos only permit merge
+commits. Without an explicit request, don't enable it at all.
 
-## 6. Cerrar
+## 6. Closing
 
-Un resumen corto: qué cambiaste, cómo se verificó, estado del CI, link del PR. Si quedó en draft
-por rojo, decilo primero.
+A short summary: what you changed, how it was verified, CI status, PR link. If it ended up as a
+draft because of a red check, say that first.

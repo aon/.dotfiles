@@ -1,9 +1,10 @@
 ---
 name: delegate-to-worktree
 description: >-
-  Hand a task off to a fresh coding agent running in its own Orca worktree, which runs the
-  `implement` workflow end to end — implement, verify, review, fix, open the PR, wait for CI. Use
-  when the user says
+  Hand a task off to a fresh coding agent running in its own Orca worktree, which carries it to a
+  green PR — either as an architect that decomposes the work, dispatches implementers, reviews every
+  stage and opens the PR, or, for small fully-specified changes, by writing the diff itself and
+  running the `pr` skill. Use when the user says
   "delegate this to a worktree", "delegá esto a un worktree", "trabajemos esto en un worktree",
   "creá un worktree por orca", "que lo trabaje otro agente", "delegate to work tree", or when a
   triage / review / planning session surfaces work that should not be implemented inline. This is a
@@ -39,11 +40,37 @@ orca status --json
 Identify the repo root of the work (usually the current working directory's repo). You address it
 as `path:<abs-repo-root>` — no need to look up the repo id.
 
-## 2. Write the brief before creating anything
+## 2. Pick the mode
 
-Write it to a file in the scratchpad directory, e.g. `<scratchpad>/brief-<slug>.md`, using
-`brief-template.md` in this skill directory. A brief is complete when a competent stranger could
-finish the task from it alone.
+The delegated agent reaches a green PR one of two ways. Pick before writing the brief — the
+template you copy depends on it.
+
+**Direct** (`brief-template-direct.md`) — the agent writes the diff itself, verifies, commits, and
+runs the `pr` skill. Use it when the change is small and already fully specified: toolchain and CI
+config, a rename, a copy change, a dependency bump, a one-file fix.
+
+**Architect** (`brief-template-architect.md`) — the agent follows the repo's
+`implement-with-architect` skill: it decomposes the task by data dependency, dispatches one
+implementer per stage, reviews and commits every stage, then verifies, runs `code-review --fix` and
+opens the PR. Use it for anything with real implementation freedom: a feature, a behavior change, a
+bug whose cause is not located yet, a change spanning several apps or packages.
+
+The test: **if the Scope you are about to write already spells out the diff — every file, and what
+it becomes — there is nothing left for an architect to decide, so go direct.** If you find yourself
+writing "figure out where X happens and change it", that is architect work.
+
+Architect mode reads `.claude/skills/implement-with-architect/SKILL.md` from inside the worktree, so
+it only exists in repos that carry that skill — `afippi` does. In a repo that does not, go direct or
+say so instead of pointing the brief at a file that is not there.
+
+Both modes are Claude-only (subagents with pinned models and the `pr` skill are both Claude Code's),
+and both end at the same place: a PR with CI green, opened by the delegated agent, not by you.
+
+## 3. Write the brief before creating anything
+
+Write it to a file in the scratchpad directory, e.g. `<scratchpad>/brief-<slug>.md`, copying the
+template for the mode you picked. A brief is complete when a competent stranger could finish the
+task from it alone.
 
 Required, in this order:
 
@@ -54,21 +81,24 @@ Required, in this order:
 3. **Scope** — what to change, and an explicit **out of scope** list. Everything you deliberately
    decided not to do belongs here; otherwise the agent rediscovers and re-litigates it.
 4. **Acceptance criteria** — observable outcomes, not implementation steps.
-5. **Closing steps** — report the workflow's `state` verbatim, then set the worktree comment.
+5. **Closing steps** — report the outcome verbatim (the PR link and CI result, or where it stopped),
+   then set the worktree comment.
 
 Prefer paths and commands over prose. Never write "as we discussed".
 
-**The delegated agent does not implement by hand — it runs the `implement` workflow.** Task, Scope
-and out-of-scope are copied verbatim into its three args, so those three sections are the brief:
-everything else is context for reading the result. The workflow verifies, reviews, fixes, opens the
-PR and waits for CI on its own, so the brief must tell the agent **not** to invoke the `pr` skill —
-otherwise two things race to open the same pull request.
+Exactly one of the two must open the pull request. In architect mode the brief tells the agent
+**not** to invoke the `pr` skill itself, because the architect's closing dispatches a subagent that
+does; in direct mode the `pr` skill is the only thing that does. Both templates already say so — do
+not soften either.
 
-Test each of the three the way the workflow will read them: a Task with an "and" joining two
-different things is two tasks, and a Scope a stranger could not act on is not a scope. If one comes
-out vague, that is the one to ask about before launching — the workflow cannot ask anything itself.
+Task, Scope and out-of-scope carry the weight in both modes: in architect mode they are decomposed
+into stage briefs whose implementers never see the original, and in direct mode they are the whole
+instruction. Test each the way the agent will read it: a Task with an "and" joining two different
+things is two tasks,
+and a Scope a stranger could not act on is not a scope. If one comes out vague, that is the one to
+ask about before launching — a delegated agent cannot ask anything itself.
 
-## 3. Create the worktree with the agent in it
+## 4. Create the worktree with the agent in it
 
 One command creates the checkout and launches the agent in its first terminal. Local `main` is
 frequently behind and Orca bases new worktrees on the *local* ref, so fetch first and pass the
@@ -80,13 +110,12 @@ orca worktree create --repo path:<abs-repo-root> --name <branch-slug> --base-bra
   --no-parent --agent claude --prompt "Leé <abs-brief-path> y ejecutá la tarea completa de punta a punta." --json
 ```
 
-- **`--agent claude`, always.** The brief tells the agent to run the `implement` workflow, and the
-  `Workflow` tool is Claude Code's — a Codex worker cannot invoke it and will fall back to doing the
-  task by hand, silently skipping the review and the CI gate. If the user asks for Codex, say that
-  first: it is a different job, not a different flag. The launch line is
+- **`--agent claude`, always.** Both modes lean on Claude Code machinery the brief names by hand:
+  the `Agent` tool and the repo skill in architect mode, the `pr` skill in direct mode. A Codex
+  worker has neither and will improvise, silently skipping the review and the CI gate. If the user
+  asks for Codex, say that first: it is a different job, not a different flag. The launch line is
   `claude '--dangerously-skip-permissions' '<prompt>'` — Orca launches it already bypassing
   approvals, so a delegated agent never stalls on a permission prompt with nobody there to answer.
-  That also covers the `Workflow` tool, which otherwise defaults to asking.
 - **Keep `--prompt` to one line that points at the brief file.** Orca passes it as a single quoted
   argv element, so a multi-line brief with code snippets in it is at the mercy of that quoting;
   a one-line pointer is immune and reads the same for either agent. Inline the whole brief only for
@@ -108,14 +137,17 @@ git -C <worktree-path> reset --hard origin/main
 ```
 
 Repo setup hooks (in `afippi`: copy `apps/*/.env`, then `pnpm install`) run in their own terminal
-alongside the agent and may still be going when it starts. That is fine — the brief tells the agent
-to ensure dependencies itself before verifying. Pass `--setup skip` only for a probe or a task that
-never runs the code.
+alongside the agent and may still be going when it starts. That is fine, and the brief assumes it —
+do not make the agent re-run `pnpm install` as a ritual first step. Pass `--setup skip` only for a
+probe or a task that never runs the code; if you do, say so in the brief, because then nothing has
+installed anything.
 
 ### When the agent needs custom flags
 
-This is the escape hatch for a worker that is not Claude: strip the workflow section out of the
-brief first, because the agent you launch here cannot run it and the brief would be lying to it.
+This is the escape hatch for a worker that is not Claude. Rewrite the brief's `Ejecución` and
+`Cierre` sections first: neither the `implement-with-architect` skill nor the `pr` skill exists for
+that agent, so leaving them in means handing it instructions it cannot follow. Spell out commit, push and
+`gh pr create` by hand instead.
 
 `--agent` launches the agent's default command line and accepts no extra argv, so a request like
 "usá codex con gpt-5.5 en xhigh" needs the two-step path instead: create the worktree bare, then
@@ -130,7 +162,7 @@ extra startup shell next to the agent when the repo has no default terminal tabs
 it only after `orca terminal list` confirms it is an unused shell. Use it only when the flags are
 the point — otherwise `--agent` is the shorter, cleaner path.
 
-## 4. Confirm, label, and let go
+## 5. Confirm, label, and let go
 
 Read the buffer once to confirm the agent actually started on the brief (the text is at
 `result.terminal.tail`; there is no `terminal output` command):
@@ -160,11 +192,11 @@ together at the end.
 
 ## Gotchas
 
-- **Stale local base.** Covered in step 3; skipping the fetch produces a PR full of unrelated
+- **Stale local base.** Covered in step 4; skipping the fetch produces a PR full of unrelated
   reverts.
 - **`pnpm install` short-circuits in fresh worktrees.** `pnpm check` fails with
-  `Cannot find module` for a dependency that *is* in `package.json`. Fix (put this in the brief, do
-  not let the agent debug the code):
+  `Cannot find module` for a dependency that *is* in `package.json`. Both templates already carry
+  the fix under `Reglas` so the agent does not go debug the code — leave it there:
   `rm -rf apps/<app>/node_modules node_modules/.modules.yaml && pnpm install --frozen-lockfile`.
 - **Missing `.env`.** The `afippi` setup hook copies `apps/*/.env` from the root checkout. If setup
   was skipped, the agent must copy them before anything that touches the database.

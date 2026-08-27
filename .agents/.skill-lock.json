@@ -104,9 +104,9 @@
       "sourceType": "github",
       "sourceUrl": "https://github.com/stablyai/orca.git",
       "skillPath": "skills/orca-cli/SKILL.md",
-      "skillFolderHash": "a5a90c9731fbee834eca6d655b39eaa795dd2323",
+      "skillFolderHash": "ee3a35c76f875ea6ebaf68947af13ba6346b13f2",
       "installedAt": "2026-06-23T16:53:59.667Z",
-      "updatedAt": "2026-08-10T13:28:16.032Z"
+      "updatedAt": "2026-08-21T18:34:59.793Z"
     },
     "impeccable": {
       "source": "pbakaus/impeccable",
@@ -347,6 +347,33 @@
       "skillFolderHash": "c29ba25c9c07534c27f1a3253bd0ca3846c4f8c7",
       "installedAt": "2026-08-06T16:09:27.016Z",
       "updatedAt": "2026-08-06T16:09:27.016Z"
+    },
+    "orchestration": {
+      "source": "stablyai/orca",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/stablyai/orca.git",
+      "skillPath": "skills/orchestration/SKILL.md",
+      "skillFolderHash": "9aa26fde93c0592e5983cdca1ccd33b402802255",
+      "installedAt": "2026-08-21T14:37:48.666Z",
+      "updatedAt": "2026-08-21T14:37:48.666Z"
+    },
+    "herdr": {
+      "source": "herdrdev/herdr",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/herdrdev/herdr.git",
+      "skillPath": "skills/herdr/SKILL.md",
+      "skillFolderHash": "f8bb649bb92ddc99e6af463ab9a635da98c7b129",
+      "installedAt": "2026-08-23T23:08:08.826Z",
+      "updatedAt": "2026-08-23T23:08:08.826Z"
+    },
+    "orca-per-workspace-env": {
+      "source": "stablyai/orca",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/stablyai/orca.git",
+      "skillPath": "skills/orca-per-workspace-env/SKILL.md",
+      "skillFolderHash": "942b9397139f9d5b6cd4164339c965c35494985d",
+      "installedAt": "2026-08-27T16:51:41.836Z",
+      "updatedAt": "2026-08-27T16:51:41.836Z"
     }
   },
   "dismissed": {

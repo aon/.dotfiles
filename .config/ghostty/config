@@ -7,8 +7,8 @@ font-size = 14
 # adjust-cell-height = 10%
 
 # Theme
-theme = TokyoNight
-minimum-contrast = 1.1
+# theme = Oxocarbon
+# minimum-contrast = 1.1
 
 # Window
 window-padding-x = 14
@@ -33,4 +33,4 @@ confirm-close-surface = false
 
 # Keybinds
 macos-option-as-alt = true
-keybind = ctrl+l=clear_screen
+keybind = ctrl+l=text:\x0c
