@@ -192,8 +192,8 @@ if [[ "$CLAUDECODE" != "1" ]] && type zoxide &>/dev/null; then
   eval "$(zoxide init --cmd cd zsh)"
 fi
 
-# inngest
-export INNGEST_API_KEY="$(get_private_config INNGEST_API_KEY)"
+# inngest -- the devbox has no .zshrc.private, so there it arrives via the environment
+export INNGEST_API_KEY="${INNGEST_API_KEY:-$(get_private_config INNGEST_API_KEY)}"
 
 ## Work related
 claude-msl() {
@@ -226,14 +226,6 @@ eval "$(mise activate zsh)"
 
 # bun completions
 [ -s "/Users/agustin/.bun/_bun" ] && source "/Users/agustin/.bun/_bun"
-
-# pnpm
-export PNPM_HOME="/Users/agustin/Library/pnpm"
-case ":$PATH:" in
-  *":$PNPM_HOME/bin:"*) ;;
-  *) export PATH="$PNPM_HOME/bin:$PATH" ;;
-esac
-# pnpm end
 
 # herdr-automatic-rename: instant tab rename on command start
 for _f in ${HOME}/.config/herdr/plugins/github/herdr-automatic-rename-*/shell/hook.zsh(N); do
