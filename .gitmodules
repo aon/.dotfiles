@@ -16,6 +16,3 @@
 [submodule "zsh/fzf-tab"]
 	path = zsh/fzf-tab
 	url = https://github.com/Aloxaf/fzf-tab.git
-[submodule "oh-my-tmux"]
-	path = oh-my-tmux
-	url = https://github.com/gpakosz/.tmux.git

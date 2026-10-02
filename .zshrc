@@ -89,8 +89,6 @@ fi
 type nvim &>/dev/null && alias vim="nvim"
 alias pip="pip3"
 alias python="python3"
-type lazygit &>/dev/null && alias lg="lazygit"
-type lazydocker &>/dev/null && alias lzd="lazydocker"
 type mpcli &>/dev/null && alias mp="mpcli"
 
 ## Source utils
@@ -171,11 +169,6 @@ fi
 # iterm
 source_if_exists "${HOME}/.iterm2_shell_integration.zsh"
 
-# lazydocker
-if type lazydocker &> /dev/null; then
-    alias lzd="lazydocker"
-fi
-
 # libpq
 if [ -d "/opt/homebrew/opt/libpq/bin" ]; then
     export PATH="/opt/homebrew/opt/libpq/bin:$PATH"
@@ -191,9 +184,6 @@ source_if_exists ${HOME}/.cargo/env
 if [[ "$CLAUDECODE" != "1" ]] && type zoxide &>/dev/null; then
   eval "$(zoxide init --cmd cd zsh)"
 fi
-
-# inngest -- the devbox has no .zshrc.private, so there it arrives via the environment
-export INNGEST_API_KEY="${INNGEST_API_KEY:-$(get_private_config INNGEST_API_KEY)}"
 
 ## Work related
 claude-msl() {
