@@ -4,19 +4,7 @@
 *
 !.gitignore
 # settings.json stays machine-local: it drifts per machine (hooks, plugins, theme).
-# settings.devbox.json is the portable subset, copied over settings.json on ephemeral devboxes.
-!settings.devbox.json
 !keybindings.json
-# Hand-written skills only. The rest of skills/ is symlinks into ~/.agents/skills,
-# which the skill installer owns via .skill-lock.json.
-!skills/
-skills/*
-!skills/bro/
-!skills/bro/**
-!skills/delegate-to-worktree/
-!skills/delegate-to-worktree/**
-!skills/pr/
-!skills/pr/**
 # Add more as needed, e.g.:
 # !CLAUDE.md
 # !commands/
